@@ -22,8 +22,6 @@ yarn install
 Executando o Projeto
 Depois de concluir as etapas acima, você pode iniciar o projeto com um dos seguintes comandos (um deles deve funcionar):
 
-yarn run dev
-yarn start
 yarn dev
 
 Seja feliz codando!
