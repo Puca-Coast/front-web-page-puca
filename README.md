@@ -1,3 +1,19 @@
+UTILITARIOS NECESSARIOS: 
+Baixar e configurar nvm ( se for windows , nvm for windows & se for linux nvm for linux)
+baixou o nvm,  no terminal do vs faça:
+- nvm install 21
+- nvm use 21
+- a partir daqui seu node sera configurado para a versao mais atual
+dps disso:
+acho que vc precisa baixar o yarn, mas de qualquer forma, no terminal tenta:
+- yarn install
+isso eh feito pra baixar os pacotes!
+dps disso sejam felizes:
+- yarn run dev ou yarn start ou yarn dev (kkkkkk n lembro, um desses vai)
+
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
