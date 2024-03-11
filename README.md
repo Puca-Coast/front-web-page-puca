@@ -1,15 +1,34 @@
-UTILITARIOS NECESSARIOS: 
-Baixar e configurar nvm ( se for windows , nvm for windows & se for linux nvm for linux)
-baixou o nvm,  no terminal do vs faça:
-- nvm install 21
-- nvm use 21
-- a partir daqui seu node sera configurado para a versao mais atual
-dps disso:
-acho que vc precisa baixar o yarn, mas de qualquer forma, no terminal tenta:
-- yarn install
-isso eh feito pra baixar os pacotes!
-dps disso sejam felizes:
-- yarn run dev ou yarn start ou yarn dev (kkkkkk n lembro, um desses vai)
+# Nome do Projeto
+
+## Utilitários Necessários
+
+### Configuração do NVM
+
+Primeiro, você precisa baixar e configurar o NVM. Se você estiver usando Windows, baixe o "nvm for windows". Se estiver usando Linux, baixe o "nvm for linux".
+
+Depois de baixar o NVM, abra o terminal do Visual Studio Code e execute os seguintes comandos:
+
+```bash
+nvm install 21
+nvm use 21
+
+A partir daqui, seu Node.js será configurado para a versão mais atual.
+
+Instalação do Yarn
+Você também precisará do Yarn. Se ainda não o tiver instalado, faça o download. Depois de baixar o Yarn, no terminal, tente executar o seguinte comando para baixar os pacotes:
+
+yarn install
+
+Executando o Projeto
+Depois de concluir as etapas acima, você pode iniciar o projeto com um dos seguintes comandos (um deles deve funcionar):
+
+yarn run dev
+yarn start
+yarn dev
+
+Seja feliz codando!
+
+Espero que isso ajude! Se você precisar de mais alguma coisa, é só me avisar.
 
 
 
