@@ -28,7 +28,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@types/animejs", "npm:3.1.12"],\
           ["@types/node", "npm:20.11.25"],\
-          ["@types/react", "npm:18.2.64"],\
+          ["@types/react", "npm:18.2.75"],\
           ["@types/react-dom", "npm:18.2.20"],\
           ["animejs", "npm:3.2.2"],\
           ["autoprefixer", "virtual:4272f1b525fa097a4b193bb028278ebc5300d949439e7a955f95c320d39ea5bef88f6528715839a924ec5a477e330f23c54460423d98db74f881c6dcbc88c2f5#npm:10.4.18"],\
@@ -38,6 +38,7 @@ const RAW_RUNTIME_STATE =
           ["postcss", "npm:8.4.35"],\
           ["react", "npm:18.2.0"],\
           ["react-dom", "virtual:4272f1b525fa097a4b193bb028278ebc5300d949439e7a955f95c320d39ea5bef88f6528715839a924ec5a477e330f23c54460423d98db74f881c6dcbc88c2f5#npm:18.2.0"],\
+          ["swiper", "npm:11.1.1"],\
           ["tailwindcss", "npm:3.4.1"],\
           ["typescript", "patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25"]\
         ],\
@@ -462,6 +463,15 @@ const RAW_RUNTIME_STATE =
           ["@types/react", "npm:18.2.64"],\
           ["@types/prop-types", "npm:15.7.11"],\
           ["@types/scheduler", "npm:0.16.8"],\
+          ["csstype", "npm:3.1.3"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:18.2.75", {\
+        "packageLocation": "../../../../.yarn/berry/cache/@types-react-npm-18.2.75-6840469812-10c0.zip/node_modules/@types/react/",\
+        "packageDependencies": [\
+          ["@types/react", "npm:18.2.75"],\
+          ["@types/prop-types", "npm:15.7.11"],\
           ["csstype", "npm:3.1.3"]\
         ],\
         "linkType": "HARD"\
@@ -3362,7 +3372,7 @@ const RAW_RUNTIME_STATE =
           ["@opentelemetry/api", null],\
           ["@swc/helpers", "npm:0.5.2"],\
           ["@types/opentelemetry__api", null],\
-          ["@types/react", "npm:18.2.64"],\
+          ["@types/react", "npm:18.2.75"],\
           ["@types/react-dom", "npm:18.2.20"],\
           ["@types/sass", null],\
           ["busboy", "npm:1.6.0"],\
@@ -3908,7 +3918,7 @@ const RAW_RUNTIME_STATE =
           ["puca-coast-v2", "workspace:."],\
           ["@types/animejs", "npm:3.1.12"],\
           ["@types/node", "npm:20.11.25"],\
-          ["@types/react", "npm:18.2.64"],\
+          ["@types/react", "npm:18.2.75"],\
           ["@types/react-dom", "npm:18.2.20"],\
           ["animejs", "npm:3.2.2"],\
           ["autoprefixer", "virtual:4272f1b525fa097a4b193bb028278ebc5300d949439e7a955f95c320d39ea5bef88f6528715839a924ec5a477e330f23c54460423d98db74f881c6dcbc88c2f5#npm:10.4.18"],\
@@ -3918,6 +3928,7 @@ const RAW_RUNTIME_STATE =
           ["postcss", "npm:8.4.35"],\
           ["react", "npm:18.2.0"],\
           ["react-dom", "virtual:4272f1b525fa097a4b193bb028278ebc5300d949439e7a955f95c320d39ea5bef88f6528715839a924ec5a477e330f23c54460423d98db74f881c6dcbc88c2f5#npm:18.2.0"],\
+          ["swiper", "npm:11.1.1"],\
           ["tailwindcss", "npm:3.4.1"],\
           ["typescript", "patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25"]\
         ],\
@@ -3964,7 +3975,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/__virtual__/react-dom-virtual-5ac47b1e5e/5/.yarn/berry/cache/react-dom-npm-18.2.0-dd675bca1c-10c0.zip/node_modules/react-dom/",\
         "packageDependencies": [\
           ["react-dom", "virtual:4272f1b525fa097a4b193bb028278ebc5300d949439e7a955f95c320d39ea5bef88f6528715839a924ec5a477e330f23c54460423d98db74f881c6dcbc88c2f5#npm:18.2.0"],\
-          ["@types/react", "npm:18.2.64"],\
+          ["@types/react", "npm:18.2.75"],\
           ["loose-envify", "npm:1.4.0"],\
           ["react", "npm:18.2.0"],\
           ["scheduler", "npm:0.23.0"]\
@@ -4456,7 +4467,7 @@ const RAW_RUNTIME_STATE =
           ["@babel/core", null],\
           ["@types/babel-plugin-macros", null],\
           ["@types/babel__core", null],\
-          ["@types/react", "npm:18.2.64"],\
+          ["@types/react", "npm:18.2.75"],\
           ["babel-plugin-macros", null],\
           ["client-only", "npm:0.0.1"],\
           ["react", "npm:18.2.0"]\
@@ -4503,6 +4514,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/supports-preserve-symlinks-flag-npm-1.0.0-f17c4d0028-10c0.zip/node_modules/supports-preserve-symlinks-flag/",\
         "packageDependencies": [\
           ["supports-preserve-symlinks-flag", "npm:1.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["swiper", [\
+      ["npm:11.1.1", {\
+        "packageLocation": "../../../../.yarn/berry/cache/swiper-npm-11.1.1-fbb4753780-10c0.zip/node_modules/swiper/",\
+        "packageDependencies": [\
+          ["swiper", "npm:11.1.1"]\
         ],\
         "linkType": "HARD"\
       }]\
