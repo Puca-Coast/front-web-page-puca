@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import '../styles/headerStyles.css';
 import anime from "animejs";
 
 export default function Header() {
@@ -16,13 +17,13 @@ export default function Header() {
   return (
     <div
       ref={headerRef}
-      className="flex items-center justify-between py-7 px-5 absolute w-full z-10 hover:bg-slate-50 group transition duration-500 ease-in-out hidden bg-white"
+      className="flex items-center justify-around py-7 px-5 absolute w-full z-10 hover:bg-slate-50 group transition duration-500 ease-in-out hidden bg-white border-b-2 border-black"
     >
       <img src="/assets/logo_mini.svg" alt="Logo" />
-      <div>
-        <span>Lookbook</span>
-        <span>Shop</span>
-        <span>Collections</span>
+      <div className="flex flex-row gap-32">
+        <span className="headerText">Lookbook</span>
+        <span className="headerText">Shop</span>
+        <span className="headerText">Collections</span>
       </div>
       <div className="flex text-teal-500 group-hover:text-teal-500 transition duration-500 ease-in-out">
         <button className="appearance-none">

@@ -10,6 +10,8 @@ export default function Home() {
   const introRef = useRef(null);
   const logoRef = useRef(null);
   const introContentRef = useRef(null);
+  const detailsRef = useRef(null);
+  const principalRef = useRef(null);
 
   useEffect(() => {
     anime({
@@ -48,6 +50,7 @@ export default function Home() {
         complete: () => {
           introContentRef.current.style.display = "none";
           logoRef.current.style.display = "none";
+          principalRef.current.style.display = "flex";
         },
       });
     }, 4000);
@@ -58,9 +61,15 @@ export default function Home() {
     <>
       <Header></Header>
       <div
-        className="flex items-center justify-center h-full w-full p-0 m-0 relative overflow-hidden"
+        className="flex items-center justify-center h-full w-full p-0 m-0 relative overflow-hidden flex-col"
       >
-        <CarouselHome></CarouselHome>
+          <CarouselHome></CarouselHome>
+          <img
+            ref={detailsRef}
+            src="/assets/details.svg"
+            alt="details grid"
+            className=" z-10 w-full h-60 object-cover"
+          ></img>
         <video
           autoPlay
           loop

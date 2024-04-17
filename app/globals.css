@@ -27,3 +27,7 @@ body {
     text-wrap: balance;
   }
 }
+
+html {
+  font-family: var('--font-jura')
+}
