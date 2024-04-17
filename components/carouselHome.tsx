@@ -1,10 +1,18 @@
-import React from 'react';
+import React, {useRef, useEffect} from 'react';
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "../styles/carouselStyles.css";
 
 export default function CarouselHome() {
+  const swiperRef = useRef(null);
+  
+  useEffect(() => {
+    setTimeout(() => {
+      swiperRef.current.style.display = "block";
+    }, 6000);
+  }, []);
+
   return (
     <Swiper
       spaceBetween={0}
@@ -13,6 +21,8 @@ export default function CarouselHome() {
       onSlideChange={() => console.log("slide change")}
       onSwiper={(swiper) => console.log(swiper)}
       className="h-full w-full relative"
+      style={{display: "none"}}
+      ref={swiperRef}
     >
       <SwiperSlide style={{width: '100%'}}>
         <Image layout="fill"  src="/assets/photo1.jpg" alt="image1" />

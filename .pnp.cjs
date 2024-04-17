@@ -27,9 +27,9 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./",\
         "packageDependencies": [\
           ["@types/animejs", "npm:3.1.12"],\
-          ["@types/node", "npm:20.11.25"],\
-          ["@types/react", "npm:18.2.75"],\
-          ["@types/react-dom", "npm:18.2.20"],\
+          ["@types/node", "npm:20.12.7"],\
+          ["@types/react", "npm:18.2.79"],\
+          ["@types/react-dom", "npm:18.2.25"],\
           ["animejs", "npm:3.2.2"],\
           ["autoprefixer", "virtual:4272f1b525fa097a4b193bb028278ebc5300d949439e7a955f95c320d39ea5bef88f6528715839a924ec5a477e330f23c54460423d98db74f881c6dcbc88c2f5#npm:10.4.18"],\
           ["eslint", "npm:8.57.0"],\
@@ -40,7 +40,7 @@ const RAW_RUNTIME_STATE =
           ["react-dom", "virtual:4272f1b525fa097a4b193bb028278ebc5300d949439e7a955f95c320d39ea5bef88f6528715839a924ec5a477e330f23c54460423d98db74f881c6dcbc88c2f5#npm:18.2.0"],\
           ["swiper", "npm:11.1.1"],\
           ["tailwindcss", "npm:3.4.1"],\
-          ["typescript", "patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25"]\
+          ["typescript", "patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=d69c25"]\
         ],\
         "linkType": "SOFT"\
       }]\
@@ -438,10 +438,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@types/node", [\
-      ["npm:20.11.25", {\
-        "packageLocation": "../../../../.yarn/berry/cache/@types-node-npm-20.11.25-b6ac39dd46-10c0.zip/node_modules/@types/node/",\
+      ["npm:20.12.7", {\
+        "packageLocation": "../../../../.yarn/berry/cache/@types-node-npm-20.12.7-3bb3d3303d-10c0.zip/node_modules/@types/node/",\
         "packageDependencies": [\
-          ["@types/node", "npm:20.11.25"],\
+          ["@types/node", "npm:20.12.7"],\
           ["undici-types", "npm:5.26.5"]\
         ],\
         "linkType": "HARD"\
@@ -467,10 +467,10 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "HARD"\
       }],\
-      ["npm:18.2.75", {\
-        "packageLocation": "../../../../.yarn/berry/cache/@types-react-npm-18.2.75-6840469812-10c0.zip/node_modules/@types/react/",\
+      ["npm:18.2.79", {\
+        "packageLocation": "../../../../.yarn/berry/cache/@types-react-npm-18.2.79-89aa23fe00-10c0.zip/node_modules/@types/react/",\
         "packageDependencies": [\
-          ["@types/react", "npm:18.2.75"],\
+          ["@types/react", "npm:18.2.79"],\
           ["@types/prop-types", "npm:15.7.11"],\
           ["csstype", "npm:3.1.3"]\
         ],\
@@ -478,10 +478,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@types/react-dom", [\
-      ["npm:18.2.20", {\
-        "packageLocation": "../../../../.yarn/berry/cache/@types-react-dom-npm-18.2.20-42274af4cd-10c0.zip/node_modules/@types/react-dom/",\
+      ["npm:18.2.25", {\
+        "packageLocation": "../../../../.yarn/berry/cache/@types-react-dom-npm-18.2.25-162e24188e-10c0.zip/node_modules/@types/react-dom/",\
         "packageDependencies": [\
-          ["@types/react-dom", "npm:18.2.20"],\
+          ["@types/react-dom", "npm:18.2.25"],\
           ["@types/react", "npm:18.2.64"]\
         ],\
         "linkType": "HARD"\
@@ -516,7 +516,7 @@ const RAW_RUNTIME_STATE =
           ["@typescript-eslint/visitor-keys", "npm:6.21.0"],\
           ["debug", "virtual:1ff4b5f90832ba0a9c93ba1223af226e44ba70c1126a3740d93562b97bc36544e896a5e95908196f7458713e6a6089a34bfc67362fc6df7fa093bd06c878be47#npm:4.3.4"],\
           ["eslint", "npm:8.57.0"],\
-          ["typescript", "patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25"]\
+          ["typescript", "patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=d69c25"]\
         ],\
         "packagePeers": [\
           "@types/eslint",\
@@ -568,7 +568,7 @@ const RAW_RUNTIME_STATE =
           ["minimatch", "npm:9.0.3"],\
           ["semver", "npm:7.6.0"],\
           ["ts-api-utils", "virtual:eaba561e4f3dc5397b47c1cec3160d6b7761b6730cf79bd1875618680ed9637abae6bec04cc39e26794f6744d497b1bfb3a9b4060aa31dea9435f5fe94e2f4f4#npm:1.2.1"],\
-          ["typescript", "patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25"]\
+          ["typescript", "patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=d69c25"]\
         ],\
         "packagePeers": [\
           "@types/typescript",\
@@ -1716,7 +1716,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-jsx-a11y", "virtual:fc011eb9a46457cf488edb130cdd9b1821cbbffd6ed11f119b98229c6e232cb274e89edb9f5367ef0f716a2e26c9d95e25a0ca5b34d36a77d50b1021d21e0206#npm:6.8.0"],\
           ["eslint-plugin-react", "virtual:fc011eb9a46457cf488edb130cdd9b1821cbbffd6ed11f119b98229c6e232cb274e89edb9f5367ef0f716a2e26c9d95e25a0ca5b34d36a77d50b1021d21e0206#npm:7.34.0"],\
           ["eslint-plugin-react-hooks", "virtual:fc011eb9a46457cf488edb130cdd9b1821cbbffd6ed11f119b98229c6e232cb274e89edb9f5367ef0f716a2e26c9d95e25a0ca5b34d36a77d50b1021d21e0206#npm:5.0.0-canary-7118f5dd7-20230705"],\
-          ["typescript", "patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25"]\
+          ["typescript", "patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=d69c25"]\
         ],\
         "packagePeers": [\
           "@types/eslint",\
@@ -3372,8 +3372,8 @@ const RAW_RUNTIME_STATE =
           ["@opentelemetry/api", null],\
           ["@swc/helpers", "npm:0.5.2"],\
           ["@types/opentelemetry__api", null],\
-          ["@types/react", "npm:18.2.75"],\
-          ["@types/react-dom", "npm:18.2.20"],\
+          ["@types/react", "npm:18.2.79"],\
+          ["@types/react-dom", "npm:18.2.25"],\
           ["@types/sass", null],\
           ["busboy", "npm:1.6.0"],\
           ["caniuse-lite", "npm:1.0.30001594"],\
@@ -3917,9 +3917,9 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["puca-coast-v2", "workspace:."],\
           ["@types/animejs", "npm:3.1.12"],\
-          ["@types/node", "npm:20.11.25"],\
-          ["@types/react", "npm:18.2.75"],\
-          ["@types/react-dom", "npm:18.2.20"],\
+          ["@types/node", "npm:20.12.7"],\
+          ["@types/react", "npm:18.2.79"],\
+          ["@types/react-dom", "npm:18.2.25"],\
           ["animejs", "npm:3.2.2"],\
           ["autoprefixer", "virtual:4272f1b525fa097a4b193bb028278ebc5300d949439e7a955f95c320d39ea5bef88f6528715839a924ec5a477e330f23c54460423d98db74f881c6dcbc88c2f5#npm:10.4.18"],\
           ["eslint", "npm:8.57.0"],\
@@ -3930,7 +3930,7 @@ const RAW_RUNTIME_STATE =
           ["react-dom", "virtual:4272f1b525fa097a4b193bb028278ebc5300d949439e7a955f95c320d39ea5bef88f6528715839a924ec5a477e330f23c54460423d98db74f881c6dcbc88c2f5#npm:18.2.0"],\
           ["swiper", "npm:11.1.1"],\
           ["tailwindcss", "npm:3.4.1"],\
-          ["typescript", "patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25"]\
+          ["typescript", "patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=d69c25"]\
         ],\
         "linkType": "SOFT"\
       }]\
@@ -3975,7 +3975,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/__virtual__/react-dom-virtual-5ac47b1e5e/5/.yarn/berry/cache/react-dom-npm-18.2.0-dd675bca1c-10c0.zip/node_modules/react-dom/",\
         "packageDependencies": [\
           ["react-dom", "virtual:4272f1b525fa097a4b193bb028278ebc5300d949439e7a955f95c320d39ea5bef88f6528715839a924ec5a477e330f23c54460423d98db74f881c6dcbc88c2f5#npm:18.2.0"],\
-          ["@types/react", "npm:18.2.75"],\
+          ["@types/react", "npm:18.2.79"],\
           ["loose-envify", "npm:1.4.0"],\
           ["react", "npm:18.2.0"],\
           ["scheduler", "npm:0.23.0"]\
@@ -4467,7 +4467,7 @@ const RAW_RUNTIME_STATE =
           ["@babel/core", null],\
           ["@types/babel-plugin-macros", null],\
           ["@types/babel__core", null],\
-          ["@types/react", "npm:18.2.75"],\
+          ["@types/react", "npm:18.2.79"],\
           ["babel-plugin-macros", null],\
           ["client-only", "npm:0.0.1"],\
           ["react", "npm:18.2.0"]\
@@ -4634,7 +4634,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["ts-api-utils", "virtual:eaba561e4f3dc5397b47c1cec3160d6b7761b6730cf79bd1875618680ed9637abae6bec04cc39e26794f6744d497b1bfb3a9b4060aa31dea9435f5fe94e2f4f4#npm:1.2.1"],\
           ["@types/typescript", null],\
-          ["typescript", "patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25"]\
+          ["typescript", "patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=d69c25"]\
         ],\
         "packagePeers": [\
           "@types/typescript",\
@@ -4750,10 +4750,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["typescript", [\
-      ["patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25", {\
-        "packageLocation": "../../../../.yarn/berry/cache/typescript-patch-5635e0237b-10c0.zip/node_modules/typescript/",\
+      ["patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=d69c25", {\
+        "packageLocation": "../../../../.yarn/berry/cache/typescript-patch-e8f2a72c29-10c0.zip/node_modules/typescript/",\
         "packageDependencies": [\
-          ["typescript", "patch:typescript@npm%3A5.4.2#optional!builtin<compat/typescript>::version=5.4.2&hash=d69c25"]\
+          ["typescript", "patch:typescript@npm%3A5.4.5#optional!builtin<compat/typescript>::version=5.4.5&hash=d69c25"]\
         ],\
         "linkType": "HARD"\
       }]\
