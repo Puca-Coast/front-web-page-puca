@@ -14,7 +14,7 @@ export default function Footer() {
   return (
     <footer
       ref={footerRef}
-      className="z-50 bg-white shadow hover:bg-slate-50 group transition duration-500 ease-in-out absolute bottom-0 w-full hidden"
+      className="z-50 bg-white shadow hover:bg-slate-50 group transition duration-500 ease-in-out absolute bottom-0 w-full hidden border-t-2 border-black mt-2"
     >
       <div className="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
         <span className="text-sm text-teal-500 sm:text-center dark:text-teal-500">

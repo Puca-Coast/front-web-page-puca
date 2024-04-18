@@ -27,13 +27,13 @@ export default function CarouselHome() {
       <SwiperSlide style={{width: '100%', height: 'auto', objectPosition: '50% 50%', objectFit: "cover"}}>
         <Image layout="fill"  src="/assets/photo1.jpg" alt="image1" />
       </SwiperSlide>
-      <SwiperSlide  style={{width: '100%', height: '100%'}}>
+      <SwiperSlide  style={{width: '100%', height: 'auto', objectPosition: '50% 50%', objectFit: "cover"}}>
         <Image layout="fill" src="/assets/photo2.jpg" alt="image2" />
       </SwiperSlide>
-      <SwiperSlide  style={{width: '100%', height: '100%'}}>
+      <SwiperSlide  style={{width: '100%', height: 'auto', objectPosition: '50% 50%', objectFit: "cover"}}>
         <Image layout="fill" src="/assets/photo3.jpg" alt="image3" />
       </SwiperSlide>
-      <SwiperSlide  style={{width: '100%', height: '100%'}}>
+      <SwiperSlide  style={{width: '100%', height: 'auto', objectPosition: '50% 50%', objectFit: "cover"}}>
         <Image layout="fill" src="/assets/photo4.jpg" alt="image4" />
       </SwiperSlide>
       {/* Adicione mais SwiperSlides se necessário */}

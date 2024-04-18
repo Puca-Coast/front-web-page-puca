@@ -51,6 +51,7 @@ export default function Home() {
           introContentRef.current.style.display = "none";
           logoRef.current.style.display = "none";
           principalRef.current.style.display = "flex";
+          detailsRef.current.style.display = "block";
         },
       });
     }, 4000);
