@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef } from "react";
+import '../styles/footerStyle.css'
 import anime from "animejs";
 
 export default function Footer() {
@@ -16,7 +17,7 @@ export default function Footer() {
       ref={footerRef}
       className="z-50 bg-white shadow hover:bg-slate-50 group transition duration-500 ease-in-out absolute bottom-0 w-full hidden border-t-2 border-black mt-2"
     >
-      <div className="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
+      <div className="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between footerContent">
         <span className="text-sm text-teal-500 sm:text-center dark:text-teal-500">
           © 2023{" "}
           <a href="https://pucacoast.com/" className="hover:underline">

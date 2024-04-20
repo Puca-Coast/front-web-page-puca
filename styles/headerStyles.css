@@ -1,6 +1,29 @@
 .headerText{
     color: #000;
     font-size: 20px;
+    font-weight: 600;
     font-style: normal;
     line-height: normal;
+    font-family: var(--font-jura), sans-serif;
+    cursor: pointer;
+    position: relative;
+}
+
+.headerText::after{
+    content: "";
+    display: block;
+    width: 0px;
+    background-color: #000;
+    margin-top: 4px;
+    height: 2px;
+    position: absolute;
+    transition: 0.3s ease;
+}
+
+.headerText:hover::after{
+    width: 55%;
+}
+
+.userLinks a{
+    margin-right: 4rem;
 }

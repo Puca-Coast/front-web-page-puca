@@ -1,0 +1,5 @@
+.footerContent a, .footerContent span {
+  font-family: var(--font-jura);
+  color: #9B9494;
+}
+
