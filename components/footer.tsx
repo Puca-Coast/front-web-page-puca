@@ -3,19 +3,24 @@ import React, { useEffect, useRef } from "react";
 import '../styles/footerStyle.css'
 import anime from "animejs";
 
-export default function Footer() {
+export default function Footer(props) {
+  const { isHome = true } = props;
   const footerRef = useRef(null);
 
   useEffect(() => {
+    if(isHome){
     setTimeout(() => {
       footerRef.current.style.display = "flex";
-    }, 6000);
+    }, 6000);}
+    else{
+      footerRef.current.style.display = "flex";
+    }
   }, []);
 
   return (
     <footer
       ref={footerRef}
-      className="z-50 bg-white shadow hover:bg-slate-50 group transition duration-500 ease-in-out absolute bottom-0 w-full hidden border-t-2 border-black mt-2"
+      className="z-50 bg-white shadow hover:bg-slate-50 group transition duration-500 ease-in-out bottom-0 w-full hidden border-t-2 border-black mt-2"
     >
       <div className="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between footerContent">
         <span className="text-sm text-teal-500 sm:text-center dark:text-teal-500">
@@ -32,7 +37,7 @@ export default function Footer() {
             </a>
           </li>
           <li>
-            <a href="#" className="hover:underline me-4 md:me-6">
+            <a href="/privacy" className="hover:underline me-4 md:me-6">
               Privacy Policy
             </a>
           </li>
