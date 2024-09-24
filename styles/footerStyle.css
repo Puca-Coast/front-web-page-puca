@@ -1,5 +1,8 @@
+/* styles/footerstyles.css */
+
 .footerContent a, .footerContent span {
   font-family: var(--font-jura);
   color: #9B9494;
 }
 
+/* Estilos adicionais para responsividade e interações */

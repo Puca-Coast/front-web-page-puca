@@ -2,16 +2,15 @@
 import React, { useEffect, useRef } from "react";
 import anime from "animejs";
 import Script from "next/script";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
-import CarouselHome from "@/components/carouselHome";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export default function Privacy() {
 
   return (
     <>
     <div className="h-full w-full flex flex-col">
-      <Header isHome={false}></Header>
+      <Header isHome={false} ></Header>
       <div style={{ padding: "20px", lineHeight: "1.6" , height: '100%'}}>
       <h1>Política de Privacidade</h1>
       <p>

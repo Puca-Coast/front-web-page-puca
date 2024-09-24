@@ -1,29 +1,64 @@
-.headerText{
-    color: #000;
-    font-size: 20px;
-    font-weight: 600;
-    font-style: normal;
-    line-height: normal;
-    font-family: var(--font-jura), sans-serif;
-    cursor: pointer;
-    position: relative;
+/* styles/headerStyles.css */
+
+.headerText {
+  color: #000;
+  font-size: 20px;
+  font-weight: 600;
+  font-style: normal;
+  line-height: normal;
+  font-family: var(--font-jura), sans-serif;
+  cursor: pointer;
+  position: relative;
 }
 
-.headerText::after{
-    content: "";
-    display: block;
-    width: 0px;
-    background-color: #000;
-    margin-top: 4px;
-    height: 2px;
-    position: absolute;
-    transition: 0.3s ease;
+.headerText::after {
+  content: "";
+  display: block;
+  width: 0px;
+  background-color: #000;
+  margin-top: 4px;
+  height: 2px;
+  position: absolute;
+  transition: 0.3s ease;
 }
 
-.headerText:hover::after{
-    width: 55%;
+.headerText:hover::after {
+  width: 55%;
 }
 
-.userLinks a{
-    margin-right: 4rem;
+.userLinks a {
+  margin-right: 4rem;
 }
+
+/* Variáveis CSS */
+:root {
+--header-text-color: #000;
+--header-underline-color: #000;
+}
+
+@media (prefers-color-scheme: dark) {
+:root {
+  --header-text-color: #000000;
+  --header-underline-color: #000000;
+}
+}
+
+@keyframes energyPulse {
+  0% {
+    background-color: #ef4444; /* Vermelho */
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5), 0 0 20px rgba(239, 68, 68, 0.3), 0 0 30px rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    background-color: #f97316; /* Laranja */
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.5), 0 0 20px rgba(249, 115, 22, 0.3), 0 0 30px rgba(249, 115, 22, 0.2);
+  }
+  100% {
+    background-color: #ef4444; /* Volta ao Vermelho */
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5), 0 0 20px rgba(239, 68, 68, 0.3), 0 0 30px rgba(239, 68, 68, 0.2);
+  }
+}
+
+.energy-circle {
+  animation: energyPulse 2s infinite ease-in-out;
+}
+
