@@ -1,4 +1,3 @@
-// components/MainContent.tsx
 "use client";
 
 import React from "react";
@@ -11,20 +10,27 @@ interface MainContentProps {
 }
 
 const MainContent: React.FC<MainContentProps> = ({ isHome }) => {
+  const headerHeight = 6; // Altura real do seu header em pixels
+  const footerHeight = 64; // Altura real do seu footer em pixels
+
+  // Calcula a altura disponível para o carousel
+  const carouselHeight = `calc(100vh - ${headerHeight}px - ${footerHeight}px)`;
+
   return (
-    <div className="w-full h-full flex flex-col">
-      {/* Header */}
+    <div className="w-full h-screen flex flex-col">
       <Header isHome={isHome} />
 
-      {/* Conteúdo Principal */}
       <div
-        className="flex items-center justify-center h-full w-full p-0 m-0 relative overflow-hidden flex-col bg-contain"
-        style={{ backgroundImage: 'url(/assets/details.svg)' }}
+        className="flex-grow"
+        style={{
+          marginTop: `${headerHeight}em`,
+          marginBottom: `${footerHeight}px`,
+          height: carouselHeight,
+        }}
       >
-        <CarouselHome />
+        <CarouselHome carouselHeight={carouselHeight} />
       </div>
 
-      {/* Footer */}
       <Footer isHome={isHome} />
     </div>
   );

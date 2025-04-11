@@ -1,16 +1,14 @@
-// src/app/signup/page.tsx
-
 "use client";
 
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
-import anime from "animejs";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InputMask from "react-input-mask"; // Para máscara de celular
-import Image from "next/image";
+
+const API_BASE_URL = "http://localhost:3000"; // Ajuste se necessário
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -24,7 +22,6 @@ export default function Signup() {
     celular?: string;
   }>({});
   const router = useRouter();
-  const formRef = useState<HTMLDivElement | null>(null)[0];
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
 
@@ -73,44 +70,55 @@ export default function Signup() {
     return Object.keys(novosErros).length === 0;
   };
 
-  // Função para lidar com o envio do formulário
+  // Função para lidar com o envio do formulário (Signup)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (validarFormulario()) {
-      try {
-        // Aqui você pode integrar com uma API para processar o cadastro
-        // Por enquanto, vamos simular o cadastro com um toast de sucesso
+    if (!validarFormulario()) {
+      toast.error("Por favor, corrija os erros no formulário.");
+      return;
+    }
 
+    try {
+      // Chama a rota de registro da sua API
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password: senha }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        toast.error(data.message || "Erro ao realizar cadastro.");
+      } else {
         toast.success("Cadastro realizado com sucesso!");
-
-        // Limpar os campos após o cadastro
+        // Limpar campos
         setEmail("");
         setSenha("");
         setConfirmarSenha("");
         setCelular("");
 
-        // Redirecionar para a página de login após alguns segundos
+        // Redirecionar para a página de login
         setTimeout(() => {
           router.push("/login");
         }, 2000);
-      } catch (error) {
-        // Trate erros de cadastro aqui
-        toast.error("Erro ao realizar cadastro. Tente novamente.");
       }
-    } else {
-      toast.error("Por favor, corrija os erros no formulário.");
+    } catch (error) {
+      console.error("Erro ao realizar cadastro:", error);
+      toast.error("Erro ao realizar cadastro. Tente novamente.");
     }
   };
 
   return (
     <>
       <Header isHome={false} />
-      <div className="w-full flex flex-col items-center justify-center mt-16 px-4">
-        <div
-          ref={formRef}
-          className="flex flex-col items-center w-full max-w-md p-6 rounded-lg bg-white shadow-md"
-        >
+
+      {/* Container que centraliza vertical/horizontal */}
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="flex flex-col items-center w-full max-w-md p-6 rounded-lg bg-white shadow-md">
           <img src="../assets/Logo2.png" className="mb-6 w-80" alt="Logo" />
           <form onSubmit={handleSubmit} className="w-full">
             {/* Campo de Email */}
@@ -129,7 +137,9 @@ export default function Signup() {
                 placeholder="Digite seu email"
                 required
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             {/* Campo de Senha */}
@@ -155,12 +165,17 @@ export default function Signup() {
               >
                 {mostrarSenha ? "🙈" : "👁️"}
               </span>
-              {errors.senha && <p className="text-red-500 text-sm mt-1">{errors.senha}</p>}
+              {errors.senha && (
+                <p className="text-red-500 text-sm mt-1">{errors.senha}</p>
+              )}
             </div>
 
             {/* Campo de Confirmar Senha */}
             <div className="mb-4 relative">
-              <label htmlFor="confirmarSenha" className="block text-gray-700 mb-2">
+              <label
+                htmlFor="confirmarSenha"
+                className="block text-gray-700 mb-2"
+              >
                 Confirmar Senha
               </label>
               <input
@@ -177,12 +192,16 @@ export default function Signup() {
               <span
                 className="absolute top-9 right-3 cursor-pointer text-gray-500 hover:text-gray-700"
                 onClick={() => setMostrarConfirmarSenha(!mostrarConfirmarSenha)}
-                aria-label={mostrarConfirmarSenha ? "Ocultar senha" : "Mostrar senha"}
+                aria-label={
+                  mostrarConfirmarSenha ? "Ocultar senha" : "Mostrar senha"
+                }
               >
                 {mostrarConfirmarSenha ? "🙈" : "👁️"}
               </span>
               {errors.confirmarSenha && (
-                <p className="text-red-500 text-sm mt-1">{errors.confirmarSenha}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.confirmarSenha}
+                </p>
               )}
             </div>
 
@@ -209,7 +228,9 @@ export default function Signup() {
                   />
                 )}
               </InputMask>
-              {errors.celular && <p className="text-red-500 text-sm mt-1">{errors.celular}</p>}
+              {errors.celular && (
+                <p className="text-red-500 text-sm mt-1">{errors.celular}</p>
+              )}
             </div>
 
             {/* Botão de Cadastro */}
@@ -220,38 +241,9 @@ export default function Signup() {
               Cadastrar
             </button>
           </form>
-
-          {/* Separador */}
-          {/* <div className="flex items-center w-full my-4">
-            <hr className="flex-grow border-gray-300" />
-            <span className="mx-2 text-gray-500">OU</span>
-            <hr className="flex-grow border-gray-300" />
-          </div> */}
-
-          {/* Botão de Cadastro com Google */}
-          {/* <button className="w-full p-2 mb-4 bg-gray-200 text-black rounded-md flex items-center justify-center hover:bg-gray-300 transition duration-300">
-            <Image
-              src="/google-icon.png"
-              alt="Google Icon"
-              width={20}
-              height={20}
-              className="w-5 h-5 mr-2"
-            />
-            Continuar com o Google
-          </button>
-
-          {/* Link para Login 
-          <p className="text-gray-700">
-            Já possui uma conta?{" "}
-            <span
-              className="text-teal-500 cursor-pointer hover:underline"
-              onClick={() => router.push("/login")}
-            >
-              Entre aqui
-            </span>
-          </p> */}
         </div>
       </div>
+
       <Footer isHome={false} />
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </>

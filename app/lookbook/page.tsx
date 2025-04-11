@@ -1,124 +1,168 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import LookbookSection from "@/components/LookBook/LookbookSection";
-import anime from "animejs/lib/anime.es.js";
-import Image from "next/image";
+import "@/styles/lookbookStyles.css"; // Importa o CSS global do masonry
 
-interface Image {
+// Tipagem simples para cada foto
+interface LookbookPhoto {
   id: string;
   src: string;
-  orientation: "horizontal" | "vertical";
+  width: number;
+  height: number;
 }
 
-interface Section {
-  id: string;
-  pattern: "single" | "double" | "triple" | "mixed" | "masonry";
-  images: Image[];
-}
+export default function LookbookPage() {
+  const [photos, setPhotos] = useState<LookbookPhoto[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-const LookbookPage: React.FC = () => {
-  const [sections, setSections] = useState<Section[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Ref do "sentinela" para IntersectionObserver
+  const observerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    // Simulação de busca de seções (substitua pela sua lógica de obtenção de dados)
-    const fetchSections = async () => {
-      // Exemplo estático:
-      setSections([
-        {
-          id: "section-double",
-          pattern: "double",
-          images: [
-            { id: "img1", src: "/assets/photo1.jpg", orientation: "horizontal" },
-            { id: "img2", src: "/assets/photo3.jpg", orientation: "horizontal" },
-          ],
-        },
-        {
-          id: "section-triple",
-          pattern: "triple",
-          images: [
-            { id: "img3", src: "/assets/photo4.jpg", orientation: "horizontal" },
-            { id: "img4", src: "/assets/photo1.jpg", orientation: "horizontal" },
-            { id: "img5", src: "/assets/photo4.jpg", orientation: "horizontal" },
-          ],
-        },
-        {
-          id: "section-mixed",
-          pattern: "mixed",
-          images: [
-            { id: "img6", src: "/assets/photo1.jpg", orientation: "horizontal" },
-            { id: "img7", src: "/assets/photo4.jpg", orientation: "vertical" },
-            { id: "img8", src: "/assets/photo1.jpg", orientation: "horizontal" },
-          ],
-        },
-        // Adicione mais seções conforme necessário
-      ]);
+  // Função para buscar fotos (paginação)
+  const fetchPhotos = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+    setIsLoading(true);
+
+    try {
+      const res = await fetch(
+        `http://localhost:3000/api/lookbook/photos?page=${page}&limit=10`
+      );
+      const data = await res.json();
+
+      if (data.success) {
+        // Carrega cada imagem para obter width/height corretos
+        const newPhotos: LookbookPhoto[] = await Promise.all(
+          data.data.map(async (photo: any) => {
+            const img = new window.Image();
+            img.src = photo.url;
+            await new Promise((resolve) => {
+              img.onload = resolve;
+            });
+            return {
+              id: photo._id,
+              src: photo.url,
+              width: img.width,
+              height: img.height,
+            };
+          })
+        );
+
+        // Adiciona as novas fotos ao estado
+        setPhotos((prev) => [...prev, ...newPhotos]);
+        setPage((prev) => prev + 1);
+
+        // Se chegamos à última página
+        if (data.pagination.currentPage >= data.pagination.totalPages) {
+          setHasMore(false);
+        }
+      } else {
+        console.error("Erro ao buscar fotos:", data.error);
+      }
+    } catch (error) {
+      console.error("Erro ao conectar com a API:", error);
+    } finally {
       setIsLoading(false);
-    };
+    }
+  }, [page, isLoading, hasMore]);
 
-    fetchSections();
-  }, []);
+  // IntersectionObserver para carregar a próxima página antes do final
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      if (entry.isIntersecting && hasMore) {
+        fetchPhotos();
+      }
+    },
+    [fetchPhotos, hasMore]
+  );
 
   useEffect(() => {
-    if (!isLoading) {
-      // Animação de entrada suave após o carregamento das seções
-      anime.timeline()
-        .add({
-          targets: '.lookbook-section',
-          opacity: [0, 1],
-          translateY: [50, 0],
-          easing: 'easeOutExpo',
-          duration: 800,
-          delay: anime.stagger(100),
-        })
-        .add({
-          targets: '.preloader',
-          opacity: [1, 0],
-          duration: 1500,
-          easing: 'easeInOutQuad',
-          complete: function(anim) {
-            document.querySelector('.preloader')?.classList.add('hidden');
-          }
-        });
-    }
-  }, [isLoading]);
+    // Configura o IntersectionObserver
+    const observer = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: "600px", // carrega antes de chegar ao fim
+      threshold: 0.1,
+    });
+
+    if (observerRef.current) observer.observe(observerRef.current);
+
+    return () => {
+      if (observerRef.current) observer.unobserve(observerRef.current);
+    };
+  }, [handleObserver]);
+
+  // Busca a primeira página ao montar
+  useEffect(() => {
+    fetchPhotos();
+  }, [fetchPhotos]);
 
   return (
-    <>
-      <div className="min-h-screen flex flex-col">
-        <Header isHome={false}  />
+    <div className="min-h-screen flex flex-col">
+      <Header isHome={false} />
 
-        {/* Preloader */}
-        {isLoading && (
-          <div className="preloader fixed inset-0 bg-white flex items-center justify-center z-50">
-            <Image src="/assets/logo_mini.svg" alt="Logo Puca Coast" width={100} height={100} />
-          </div>
-        )}
-
-        {/* Conteúdo da Página */}
-        <div className="flex-1 px-6 lg:px-36 py-8">
-          {sections.map((section) => (
-            <LookbookSection key={section.id} pattern={section.pattern} images={section.images} />
+      {/* Container do conteúdo */}
+      <div className="flex-1 w-full mx-auto px-4 pt-20">
+        {/* Mosaico */}
+        <div className="masonry-grid">
+          {photos.map((photo) => (
+            <PhotoCard key={photo.id} photo={photo} />
           ))}
         </div>
 
-        <Footer isHome={false} />
+        {/* Sentinela do IntersectionObserver */}
+        <div ref={observerRef} className="h-10" />
       </div>
 
+      <Footer isHome={false} />
+
+      {isLoading && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2">
+          <div className="spinner-border animate-spin w-8 h-8 border-4 rounded-full text-blue-500"></div>
+        </div>
+      )}
+
       <style jsx>{`
-        /* Preloader */
-        .preloader {
-          transition: opacity 1.5s ease-in-out;
-        }
-        .preloader.hidden {
-          display: none;
+        .spinner-border {
+          border-color: #ccc;
+          border-top-color: #3498db;
+          border-radius: 50%;
         }
       `}</style>
-    </>
+    </div>
   );
-};
+}
 
-export default LookbookPage;
+// Componente de cada foto, com fade-in e placeholder
+function PhotoCard({ photo }: { photo: LookbookPhoto }) {
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <div className="masonry-item">
+      <Image
+        src={photo.src}
+        alt="Lookbook Photo"
+        width={photo.width}
+        height={photo.height}
+        layout="responsive"
+        objectFit="cover"
+        loading="lazy"       // lazy loading
+        decoding="async"
+        placeholder="blur"   // placeholder de blur
+        blurDataURL="/assets/placeholder.png"
+        sizes="(max-width: 640px) 100vw,
+               (max-width: 1024px) 50vw,
+               33vw"
+        onLoadingComplete={() => setLoaded(true)}
+        className={`rounded-md transition-opacity duration-700 ${
+          loaded ? "opacity-100" : "opacity-0"
+          
+        }`}
+      />
+    </div>
+  );
+}

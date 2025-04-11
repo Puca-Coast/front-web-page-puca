@@ -1,5 +1,3 @@
-// src/app/shop/page.tsx
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -8,160 +6,150 @@ import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
 import anime from "animejs";
 import Image from "next/image";
+import WavyLoader from "@/components/WavyLoader";
 
-interface Item {
-  imageUrl: string;
-  hoverImageUrl: string;
+interface ProductItem {
+  _id: string;
+  imageUrl: string;      // ex: /api/products/image/:id
+  hoverImageUrl: string; // ex: /api/products/image/:id
   name: string;
-  price: string;
+  price: number;
 }
 
+const API_BASE_URL = "http://localhost:3000"; // Ajuste conforme sua API
+
 export default function Shop() {
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<ProductItem[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const router = useRouter();
 
-  // Simulação de chamada de API para buscar itens
+  // Busca produtos
   useEffect(() => {
-    // Simula uma chamada de API com atraso de 1 segundo
-    const fetchItems = async () => {
-      const fetchedItems: Item[] = [
-        {
-          imageUrl: "/assets/photo1.jpg",
-          hoverImageUrl: "/assets/photo2.jpg",
-          name: "Modelo 1",
-          price: "R$99,99",
-        },
-        {
-          imageUrl: "/assets/photo3.jpg",
-          hoverImageUrl: "/assets/photo4.jpg",
-          name: "Modelo 2",
-          price: "R$149,99",
-        },
-        {
-          imageUrl: "/assets/photo2.jpg",
-          hoverImageUrl: "/assets/photo1.jpg",
-          name: "Modelo 3",
-          price: "R$199,99",
-        },
-        {
-          imageUrl: "/assets/photo4.jpg",
-          hoverImageUrl: "/assets/photo3.jpg",
-          name: "Modelo 4",
-          price: "R$249,99",
-        },
-        {
-          imageUrl: "/assets/photo1.jpg",
-          hoverImageUrl: "/assets/photo2.jpg",
-          name: "Modelo 5",
-          price: "R$299,99",
-        },
-        {
-          imageUrl: "/assets/photo3.jpg", // Corrigido para evitar repetição
-          hoverImageUrl: "/assets/photo4.jpg",
-          name: "Modelo 6",
-          price: "R$349,99",
-        },
-      ];
-      // Simula atraso
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      setItems(fetchedItems);
+    const fetchProducts = async () => {
+      setLoadingProducts(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/products?page=1&limit=100`);
+        if (!response.ok) {
+          throw new Error(`Erro na resposta: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.success) {
+          const fetchedItems = data.data.map((product: any) => ({
+            _id: product._id,
+            imageUrl: `${API_BASE_URL}/api/products/image/${product.imageUrl}`,
+            hoverImageUrl: `${API_BASE_URL}/api/products/image/${product.hoverImageUrl}`,
+            name: product.name,
+            price: product.price,
+          }));
+          setItems(fetchedItems);
+        } else {
+          console.error("Erro ao buscar produtos:", data.message);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+      } finally {
+        setLoadingProducts(false);
+      }
     };
 
-    fetchItems();
+    fetchProducts();
   }, []);
 
-  // Aplicação das animações com anime.js após os itens serem carregados
+  // Animação de entrada com anime.js
   useEffect(() => {
-    if (items.length === 0) return; // Não anima se não houver itens
-
-    // Seleciona todos os elementos com a classe 'shop-item'
+    if (items.length === 0) return;
     const shopItems = document.querySelectorAll<HTMLElement>(".shop-item");
-
     anime({
       targets: shopItems,
       opacity: [0, 1],
       translateY: [100, 0],
       easing: "easeOutExpo",
       duration: 1200,
-      delay: anime.stagger(200, { start: 0 }), // Atraso progressivo de 200ms, iniciando após 500ms
+      delay: anime.stagger(200, { start: 0 }),
     });
   }, [items]);
 
+  if (loadingProducts) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <WavyLoader />
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600 text-lg">Não há produtos para exibir.</p>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <div className="h-full w-full flex flex-col">
+    <div className="min-h-screen w-full flex flex-col">
       <Header isHome={false} />
-        <div className="h-full flex flex-wrap overflow-scroll pt-10 image-section">
+
+      {/* Container principal da listagem */}
+      <div className="flex-1 px-6 pt-10">
+        {/* Grid de produtos: 1 col no mobile, 2 col no sm, 3 col no md */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {items.map((item, index) => (
             <div
-              key={index}
+              key={item._id}
+              className="shop-item relative cursor-pointer overflow-hidden"
+              style={{ opacity: 0 }} // inicia invisível p/ animação
               onMouseEnter={() => setHoverIndex(index)}
               onMouseLeave={() => setHoverIndex(null)}
-              className={`shop-item h-4/6 border border-gray-100 ${
-                index % 3 === 1 ? "mx-auto" : ""
-              } mb-12 relative cursor-pointer drop-shadow-sm`}
-              style={{ width: "30%" }}
-              onClick={() => router.push("/product")}
+              onClick={() => router.push(`/product/${item._id}`)}
               role="button"
               tabIndex={0}
               aria-label={`Visitar página do produto ${item.name}`}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") router.push("/product");
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  router.push(`/product/${item._id}`);
+                }
               }}
             >
-              {/* Imagem de fundo padrão */}
-              <Image
-                src={item.imageUrl}
-                alt={item.name}
-                layout="fill"
-                objectFit="cover"
-                className="rounded-md transition-opacity duration-1000 ease-in-out"
-                style={{
-                  opacity: hoverIndex === index ? 0 : 1,
-                }}
-                loading="lazy"
-              />
-              {/* Imagem de hover */}
-              <Image
-                src={item.hoverImageUrl}
-                alt={`${item.name} - Hover`}
-                layout="fill"
-                objectFit="cover"
-                className="rounded-md transition-opacity duration-1000 ease-in-out"
-                style={{
-                  opacity: hoverIndex === index ? 1 : 0,
-                }}
-                loading="lazy"
-              />
-              {/* Película escura */}
-              <div
-                style={{
-                  position: "absolute",
-                  width: "100%",
-                  height: "100%",
-                  backgroundColor: "black",
-                  transition: "opacity 1s ease-in-out",
-                  opacity: hoverIndex === index ? 0 : 0.5,
-                }}
-                className="pelicula-escura"
-              ></div>
-              {/* Texto do nome e preço */}
-              <div className="absolute bottom-0 left-0 pr-10 pb-6 text-white w-full text-right">
+              {/* Contêiner para Image fill - define a altura ou aspect ratio */}
+              {/* Exemplo: aspect-[4/5] => 4:5. Altere para aspect-square, h-96 etc. */}
+              <div className="relative w-full aspect-[4/5]">
+                {/* Imagem principal */}
+                <Image
+                  src={item.imageUrl}
+                  alt={item.name}
+                  fill
+                  unoptimized
+                  className="object-cover transition-opacity duration-1000 ease-in-out"
+                  style={{ opacity: hoverIndex === index ? 0 : 1 }}
+                />
+                {/* Imagem hover */}
+                <Image
+                  src={item.hoverImageUrl}
+                  alt={`${item.name} - Hover`}
+                  fill
+                  unoptimized
+                  className="object-cover absolute top-0 left-0 transition-opacity duration-1000 ease-in-out"
+                  style={{ opacity: hoverIndex === index ? 1 : 0 }}
+                />
+                {/* Overlay semitransparente */}
+                <div
+                  className="absolute top-0 left-0 w-full h-full bg-black transition-opacity duration-1000 ease-in-out"
+                  style={{ opacity: hoverIndex === index ? 0 : 0.5 }}
+                ></div>
+              </div>
+
+              {/* Texto (nome e preço) - canto inferior direito */}
+              <div className="absolute bottom-2 right-2 text-white text-right z-10">
                 <p className="font-bold">{item.name}</p>
-                <p>{item.price}</p>
+                <p>R$ {item.price.toFixed(2)}</p>
               </div>
             </div>
           ))}
         </div>
-        <Footer isHome={false} />
       </div>
 
-      {/* <div className="preloader fixed inset-0 flex items-center justify-center bg-white z-50">
-        <div className="loader">Loading...</div>
-      </div> 
-      {/* ToastContainer para notificações, caso necessário */}
-      {/* <ToastContainer position="top-right" autoClose={3000} hideProgressBar /> */}
-    </>
+      <Footer isHome={false} />
+    </div>
   );
 }

@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -28,32 +26,8 @@ body {
 }
 
 html {
-  font-family: var('--font-jura')
-}
-
-/* styles/globals.css ou styles/lookbookStyles.css */
-
-/* Masonry Layout */
-.masonry-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Aumentado para 300px */
-  grid-auto-rows: 10px;
-  gap: 15px; /* Aumentado o gap para mais espaçamento */
-}
-
-.masonry-item {
-  /* Cada item define quantas linhas (10px cada) ele ocupa */
-  grid-row-end: span 40; /* Aumentado para acomodar imagens horizontais maiores */
-}
-
-@media (max-width: 768px) {
-  .masonry-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Ajuste para telas menores */
-  }
-
-  .masonry-item {
-    grid-row-end: span 30; /* Ajuste conforme o tamanho das imagens */
-  }
+  font-family: var('--font-jura');
+  overflow-x: hidden;
 }
 
 /* Hover suave nos ícones de redes sociais */
@@ -122,4 +96,36 @@ button[type="submit"]:hover {
   margin-top: 0.25rem; /* Tailwind's mt-1 spacing */
 }
 
-/* Adicione mais estilos conforme necessário */
+/* styles/masonry.css */
+
+/* Container com 3 colunas no desktop */
+.masonry-grid {
+  column-count: 3;
+  column-gap: 1rem;
+}
+
+/* Ajusta para 2 colunas em telas médias */
+@media (max-width: 1024px) {
+  .masonry-grid {
+    column-count: 2;
+  }
+}
+
+/* Ajusta para 1 coluna em telas pequenas */
+@media (max-width: 640px) {
+  .masonry-grid {
+    column-count: 1;
+  }
+}
+
+/* Cada item ocupa 100% da largura da coluna */
+.masonry-item {
+  display: inline-block; /* importante para o column layout */
+  width: 100%;
+  margin-bottom: 1rem;
+
+  /* evita quebra no meio de uma imagem */
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+}

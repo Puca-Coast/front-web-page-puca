@@ -1,4 +1,4 @@
-// components/footer.js
+// components/Footer.js
 "use client"; // Torna este componente um Client Component
 
 import React, { useEffect, useRef, useState } from "react";
@@ -37,28 +37,28 @@ export default function Footer(props) {
       }`}
       style={{ display: isHome ? "none" : "flex" }} // Inicia com display none se for Home
     >
-      <div className="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between footerContent">
-        <span className="text-sm text-teal-500 sm:text-center dark:text-teal-500">
+      <div className="w-full mx-auto max-w-screen-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between footerContent">
+        <span className="text-sm text-teal-500 text-center md:text-left dark:text-teal-500">
           © 2023{" "}
           <a href="https://pucacoast.com/" className="hover:underline">
             Puca Coast™
           </a>
           . All Rights Reserved.
         </span>
-        <ul className="flex flex-wrap items-center mt-3 text-sm font-medium text-teal-500 dark:text-teal-500 sm:mt-0">
+        <ul className="flex flex-col md:flex-row flex-wrap items-center mt-3 md:mt-0 text-sm font-medium text-teal-500 dark:text-teal-500">
           <li>
-            <a href="/privacy" className="hover:underline me-4 md:me-6">
-              termos e condições
+            <a href="/privacy" className="hover:underline mr-4 md:mr-6">
+              Termos e Condições
             </a>
           </li>
           <li>
-            <a href="#" className="hover:underline me-4 md:me-6">
-            contato
+            <a href="#" className="hover:underline mr-4 md:mr-6">
+              Contato
             </a>
           </li>
           <li>
-            <a href="#" className="hover:underline me-4 md:me-6">
-            troca e devolução
+            <a href="#" className="hover:underline mr-4 md:mr-6">
+              Troca e Devolução
             </a>
           </li>
         </ul>

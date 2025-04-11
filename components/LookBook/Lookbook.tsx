@@ -1,67 +1,142 @@
 "use client";
 
-import React from "react";
-import LookbookSection from "./LookbookSection";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
+import Header from "@/components/Header"; // se quiser remover, fique à vontade
+import Footer from "@/components/Footer"; // idem
+import "@/styles/lookbookStyles.css"; // Importa o arquivo de estilo global (AJUSTE O CAMINHO)
 
-interface Image {
+interface LookbookPhoto {
   id: string;
   src: string;
-  orientation: "horizontal" | "vertical";
+  width: number;
+  height: number;
 }
 
-interface Section {
-  id: string;
-  pattern: "single" | "double" | "triple" | "mixed" | "masonry";
-  images: Image[];
-}
+export default function LookbookPage() {
+  const [photos, setPhotos] = useState<LookbookPhoto[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-const Lookbook: React.FC = () => {
-  const sections: Section[] = [
-    {
-      id: "section-double",
-      pattern: "double",
-      images: [
-        { id: "img1", src: "/assets/photo1.jpg", orientation: "horizontal" },
-        { id: "img2", src: "/assets/photo3.jpg", orientation: "horizontal" },
-      ],
+  const observerRef = useRef<HTMLDivElement | null>(null);
+
+  // Função para buscar as fotos (com paginação)
+  const fetchPhotos = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+    setIsLoading(true);
+
+    try {
+      // Chame sua API (AJUSTE O ENDPOINT CONFORME NECESSÁRIO)
+      const res = await fetch(`http://localhost:3000/api/lookbook/photos?page=${page}&limit=10`);
+      const data = await res.json();
+
+      if (data.success) {
+        // Para cada foto, carregamos a imagem para obter width e height
+        const newPhotos: LookbookPhoto[] = await Promise.all(
+          data.data.map(async (photo: any) => {
+            const img = new window.Image();
+            img.src = photo.url;
+
+            // Espera carregar para ter width e height corretos
+            await new Promise((resolve) => {
+              img.onload = resolve;
+            });
+
+            return {
+              id: photo._id,
+              src: photo.url,
+              width: img.width,
+              height: img.height,
+            };
+          })
+        );
+
+        setPhotos((prev) => [...prev, ...newPhotos]);
+        setPage((prev) => prev + 1);
+
+        // Verifica se ainda há mais páginas
+        if (data.pagination.currentPage >= data.pagination.totalPages) {
+          setHasMore(false);
+        }
+      } else {
+        console.error("Erro ao buscar fotos:", data.error);
+      }
+    } catch (error) {
+      console.error("Erro ao conectar com a API:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [page, isLoading, hasMore]);
+
+  // IntersectionObserver: dispara fetch antes de chegar ao fim
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      if (entry.isIntersecting && hasMore) {
+        fetchPhotos();
+      }
     },
-    {
-      id: "section-triple",
-      pattern: "triple",
-      images: [
-        { id: "img3", src: "/assets/photo4.jpg", orientation: "horizontal" },
-        { id: "img4", src: "/assets/photo1.jpg", orientation: "horizontal" },
-        { id: "img5", src: "/assets/photo4.jpg", orientation: "horizontal" },
-      ],
-    },
-    {
-      id: "section-mixed",
-      pattern: "mixed",
-      images: [
-        { id: "img6", src: "/assets/photo1.jpg", orientation: "horizontal" },
-        { id: "img7", src: "/assets/photo4.jpg", orientation: "vertical" },
-        { id: "img8", src: "/assets/photo1.jpg", orientation: "horizontal" },
-      ],
-    },
-    // Adicione mais seções conforme necessário
-  ];
+    [fetchPhotos, hasMore]
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: "600px", // Carrega fotos 600px antes do final
+      threshold: 0.1,
+    });
+
+    if (observerRef.current) observer.observe(observerRef.current);
+
+    return () => {
+      if (observerRef.current) observer.unobserve(observerRef.current);
+    };
+  }, [handleObserver]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
-      <Header isHome={false}  />
-      
-      {/* Aumentar o padding lateral para dar mais espaço */}
-      <div className="flex-1 px-6 lg:px-36 py-8">
-        {sections.map((section) => (
-          <LookbookSection key={section.id} pattern={section.pattern} images={section.images} />
-        ))}
+    <div className="min-h-screen flex flex-col">
+      <Header isHome={false} />
+
+      {/* Container centralizado e amplo */}
+      <div className="flex-1 w-full max-w-screen-xl mx-auto px-4">
+        {/* Mosaico */}
+        <div className="masonry-grid mt-8">
+          {photos.map((photo) => (
+            <div key={photo.id} className="masonry-item">
+              <Image
+                src={photo.src}
+                alt="Lookbook Photo"
+                width={photo.width}
+                height={photo.height}
+                layout="responsive"
+                objectFit="cover"
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Sentinela para disparar paginação */}
+        <div ref={observerRef} className="h-10" />
       </div>
 
       <Footer isHome={false} />
+
+      {/* Loading Spinner (opcional) */}
+      {isLoading && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2">
+          <div className="spinner-border animate-spin w-8 h-8 border-4 rounded-full text-blue-500"></div>
+        </div>
+      )}
+
+      <style jsx>{`
+        .spinner-border {
+          border-color: #ccc;
+          border-top-color: #3498db;
+          border-radius: 50%;
+        }
+      `}</style>
     </div>
   );
-};
-
-export default Lookbook;
+}

@@ -9,6 +9,8 @@ import anime from "animejs";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const API_BASE_URL = "http://localhost:3000"; // Ajuste se necessário
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -53,56 +55,50 @@ export default function Login() {
     return Object.keys(novosErros).length === 0;
   };
 
-  // Função para lidar com o envio do formulário
+  // Função para lidar com o envio do formulário (Login)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (validarFormulario()) {
-      setLoading(true);
-      try {
-        // Aqui você pode integrar com uma API de autenticação
-        // Por enquanto, vamos simular o login com um toast de sucesso após um delay
+    if (!validarFormulario()) {
+      toast.error("Por favor, corrija os erros no formulário.");
+      return;
+    }
 
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // Simula uma chamada de API
+    setLoading(true);
+    try {
+      // Faz a requisição à rota de login da sua API
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password: senha }),
+      });
 
+      const data = await response.json();
+
+      if (!data.success) {
+        // Se o back-end retornar success=false
+        toast.error(data.message || "Erro ao fazer login.");
+      } else {
+        // Login bem-sucedido
         toast.success("Login realizado com sucesso!");
+        // Armazene o token e a role (se precisar) no localStorage ou cookies
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
 
-        // Limpar os campos após o login
+        // Limpar campos
         setEmail("");
         setSenha("");
 
-        // Redirecionar para a página inicial ou dashboard após alguns segundos
+        // Redirecionar para a página inicial ou dashboard
         setTimeout(() => {
-          router.push("/"); // Altere para a página desejada após o login
+          router.push("/"); // Ajuste para a página que desejar
         }, 2000);
-      } catch (error) {
-        // Trate erros de autenticação aqui
-        toast.error("Erro ao realizar login. Tente novamente.");
-      } finally {
-        setLoading(false);
       }
-    } else {
-      toast.error("Por favor, corrija os erros no formulário.");
-    }
-  };
-
-  // Função para lidar com Login com Google
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      // Integre com a lógica de autenticação do Google aqui
-      // Por enquanto, vamos simular com um delay
-
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simula uma chamada de API
-
-      toast.success("Login com Google realizado com sucesso!");
-
-      // Redirecionar após o login
-      setTimeout(() => {
-        router.push("/"); // Altere para a página desejada após o login
-      }, 2000);
     } catch (error) {
-      toast.error("Erro ao realizar login com Google. Tente novamente.");
+      console.error("Erro ao realizar login:", error);
+      toast.error("Erro ao realizar login. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -111,12 +107,15 @@ export default function Login() {
   return (
     <>
       <Header isHome={false} />
-      <div className="w-full flex flex-col items-center justify-center mt-16 px-4">
+
+      {/* Container que centraliza vertical/horizontal */}
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div
           ref={formRef}
           className="flex flex-col items-center w-full max-w-md p-6 rounded-lg bg-white shadow-md"
         >
           <img src="../assets/Logo2.png" className="mb-6 w-80" alt="Logo" />
+
           <form onSubmit={handleSubmit} className="w-full">
             {/* Campo de Email */}
             <div className="mb-4">
@@ -134,7 +133,9 @@ export default function Login() {
                 placeholder="Digite seu email"
                 required
               />
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             {/* Campo de Senha */}
@@ -160,7 +161,9 @@ export default function Login() {
               >
                 {mostrarSenha ? "🙈" : "👁️"}
               </span>
-              {errors.senha && <p className="text-red-500 text-sm mt-1">{errors.senha}</p>}
+              {errors.senha && (
+                <p className="text-red-500 text-sm mt-1">{errors.senha}</p>
+              )}
             </div>
 
             {/* Botão de Login */}
@@ -172,29 +175,6 @@ export default function Login() {
               {loading ? "Entrando..." : "Entrar"}
             </button>
           </form>
-
-          {/* Separador */}
-          {/* <div className="flex items-center w-full my-4">
-            <hr className="flex-grow border-gray-300" />
-            <span className="mx-2 text-gray-500">OU</span>
-            <hr className="flex-grow border-gray-300" />
-          </div> */}
-
-          {/* Botão de Login com Google */}
-          {/* <button
-            className="w-full p-2 mb-4 bg-gray-200 text-black rounded-md flex items-center justify-center hover:bg-gray-300 transition duration-300"
-            onClick={handleGoogleLogin}
-            disabled={loading}
-          >
-            <Image
-              src="/google-icon.png"
-              alt="Google Icon"
-              width={20}
-              height={20}
-              className="w-5 h-5 mr-2"
-            />
-            {loading ? "Entrando com Google..." : "Continuar com o Google"}
-          </button> */}
 
           {/* Link para Signup */}
           <p className="text-gray-700">
@@ -208,6 +188,7 @@ export default function Login() {
           </p>
         </div>
       </div>
+
       <Footer isHome={false} />
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     </>
