@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CartProvider } from "@/app/context/CartContext";
+import { ApiProvider } from "@/app/context/ApiContext";
 import { Inter, Jura } from "next/font/google";
 import "./globals.css";
 
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${jura.variable}`}>
-        <CartProvider>{children}</CartProvider>
+        <ApiProvider>
+          <CartProvider>{children}</CartProvider>
+        </ApiProvider>
       </body>
     </html>
   );

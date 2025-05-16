@@ -16,7 +16,7 @@ interface ProductItem {
   price: number;
 }
 
-const API_BASE_URL = "http://localhost:3000"; // Ajuste conforme sua API
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // Ajuste conforme sua API
 
 export default function Shop() {
   const [items, setItems] = useState<ProductItem[]>([]);

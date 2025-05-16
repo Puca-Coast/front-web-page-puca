@@ -1,0 +1,18 @@
+[build]
+  command = "yarn build"
+  publish = ".next"
+
+[build.environment]
+  NEXT_PUBLIC_API_BASE_URL = "https://puca-api.vercel.app"
+  NODE_VERSION = "21"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin" 

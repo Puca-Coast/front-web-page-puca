@@ -8,7 +8,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InputMask from "react-input-mask"; // Para máscara de celular
 
-const API_BASE_URL = "http://localhost:3000"; // Ajuste se necessário
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL; // Ajuste se necessário
 
 export default function Signup() {
   const [email, setEmail] = useState("");

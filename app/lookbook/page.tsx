@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { get } from "@/app/utils/api";
 import "@/styles/lookbookStyles.css"; // Importa o CSS global do masonry
 
 // Tipagem simples para cada foto
@@ -12,6 +13,16 @@ interface LookbookPhoto {
   src: string;
   width: number;
   height: number;
+}
+
+interface LookbookApiResponse {
+  success: boolean;
+  data: Array<{ _id: string; url: string }>;
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+  };
+  error?: string;
 }
 
 export default function LookbookPage() {
@@ -29,15 +40,14 @@ export default function LookbookPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(
-        `http://localhost:3000/api/lookbook/photos?page=${page}&limit=10`
+      const data = await get<LookbookApiResponse>(
+        `/api/lookbook/photos?page=${page}&limit=10`
       );
-      const data = await res.json();
 
       if (data.success) {
         // Carrega cada imagem para obter width/height corretos
         const newPhotos: LookbookPhoto[] = await Promise.all(
-          data.data.map(async (photo: any) => {
+          data.data.map(async (photo) => {
             const img = new window.Image();
             img.src = photo.url;
             await new Promise((resolve) => {

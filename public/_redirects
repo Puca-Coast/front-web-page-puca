@@ -1,0 +1,5 @@
+# Redirecionamentos para SPA
+/*    /index.html   200
+
+# Redirecionamentos para API
+/api/*  https://puca-api.vercel.app/api/:splat  200 
