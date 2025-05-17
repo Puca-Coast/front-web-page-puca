@@ -1,14 +1,31 @@
-// app/page.tsx
+"use client";
 
-import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import HomeWithIntro from "@/components/Home/HomeWithIntro";
+import HomeWithoutIntro from "@/components/Home/HomeWithoutIntro";
 
-// Importação dinâmica do componente real que será carregado apenas no cliente
-const HomeClient = dynamic(() => import('@/components/Home/HomeClient'), { 
-  ssr: false,
-  loading: () => <div className="w-screen h-screen flex items-center justify-center bg-black text-white">Carregando...</div>
-});
-
-// Componente de página simples que será pré-renderizado
 export default function Home() {
-  return <HomeClient />;
+  const searchParams = useSearchParams();
+  const skipIntro = searchParams?.get('skipIntro');
+  const shouldSkipIntro = skipIntro === "true";
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return <div className="w-screen h-screen flex items-center justify-center bg-black text-white">Carregando...</div>;
+  }
+
+  return (
+    <>
+      {shouldSkipIntro ? (
+        <HomeWithoutIntro />
+      ) : (
+        <HomeWithIntro />
+      )}
+    </>
+  );
 }
