@@ -17,9 +17,13 @@ interface CarouselApiResponse {
   error?: string;
 }
 
+interface CarouselHomeProps {
+  carouselHeight?: string;
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 console.log(API_BASE_URL);
-export default function CarouselHome() {
+export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
   const [photos, setPhotos] = useState<LookbookPhoto[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -101,7 +105,8 @@ export default function CarouselHome() {
 
   return (
     <div
-      className="marquee-container relative w-full bg-white h-[300px]"
+      className="marquee-container relative w-full bg-white"
+      style={{ height: carouselHeight || '300px' }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

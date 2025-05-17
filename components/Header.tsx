@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import "../styles/headerStyles.css";
 import CartModal from "./Cart/Cart";
 import { useCart } from "@/app/context/CartContext";
@@ -53,10 +54,12 @@ export default function Header({ isHome }: { isHome: boolean }) {
         style={{ display: isHome ? "none" : "flex" }}
       >
         <Link href="/?skipIntro=true">
-          <img
+          <Image
             src="/assets/logo_mini.png"
             alt="Logo"
-            className="w-24 transform rotate-[-10deg] transition-transform duration-500 hover:rotate-0"
+            width={96}
+            height={48}
+            className="transform rotate-[-10deg] transition-transform duration-500 hover:rotate-0"
           />
         </Link>
         {/* Links de navegação */}
@@ -78,10 +81,12 @@ export default function Header({ isHome }: { isHome: boolean }) {
             className="cursor-pointer relative focus:outline-none"
             aria-label="Abrir carrinho de compras"
           >
-            <img
+            <Image
               src="/assets/shoppingbag.svg"
               alt="shoppingbag_icon"
-              className="w-6 h-6 transition-transform duration-500 hover:scale-110"
+              width={24}
+              height={24}
+              className="transition-transform duration-500 hover:scale-110"
             />
             {cartItems.length > 0 && (
               <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
@@ -93,10 +98,12 @@ export default function Header({ isHome }: { isHome: boolean }) {
             href={isAuthenticated ? "/profile" : "/login"}
             className="ml-4"
           >
-            <img
+            <Image
               src="/assets/User.svg"
               alt="user_icon"
-              className="w-6 h-6 transition-transform duration-500 hover:scale-110"
+              width={24}
+              height={24}
+              className="transition-transform duration-500 hover:scale-110"
             />
           </Link>
         </div>
@@ -132,10 +139,12 @@ export default function Header({ isHome }: { isHome: boolean }) {
       >
         <div className="flex items-center justify-between px-5 py-4 border-b-2 border-black">
           <Link href="/?skipIntro=true">
-            <img
+            <Image
               src="/assets/logo_mini.png"
               alt="Logo"
-              className="w-20 transform rotate-[-10deg]"
+              width={80}
+              height={40}
+              className="transform rotate-[-10deg]"
             />
           </Link>
           <button
@@ -176,17 +185,21 @@ export default function Header({ isHome }: { isHome: boolean }) {
             className="focus:outline-none"
             aria-label="Abrir carrinho de compras"
           >
-            <img
+            <Image
               src="/assets/shoppingbag.svg"
               alt="shoppingbag_icon"
-              className="w-8 h-8 transition-transform duration-500 hover:scale-110"
+              width={32}
+              height={32}
+              className="transition-transform duration-500 hover:scale-110"
             />
           </button>
           <Link href={isAuthenticated ? "/profile" : "/login"} onClick={toggleMenu}>
-            <img
+            <Image
               src="/assets/User.svg"
               alt="user_icon"
-              className="w-8 h-8 transition-transform duration-500 hover:scale-110"
+              width={32}
+              height={32}
+              className="transition-transform duration-500 hover:scale-110"
             />
           </Link>
         </div>

@@ -84,8 +84,8 @@ export default function About() {
             </p>
             {/* Ícones de Redes Sociais */}
             <div className="social-icons flex justify-center lg:justify-start space-x-4">
-              <a href="#"><img src="/assets/twitter.png" alt="Twitter" className="w-6 h-6" /></a>
-              <a href="#"><img src="/assets/instagram.png" alt="Instagram" className="w-6 h-6" /></a>
+              <a href="#"><Image src="/assets/twitter.png" alt="Twitter" width={24} height={24} /></a>
+              <a href="#"><Image src="/assets/instagram.png" alt="Instagram" width={24} height={24} /></a>
             </div>
           </div>
         </div>
