@@ -1,42 +1,27 @@
+// app/page.tsx
 "use client";
 
-import React, { Suspense } from "react";
+import React from "react";
+import { useSearchParams } from "next/navigation";
 import HomeWithIntro from "@/components/Home/HomeWithIntro";
 import HomeWithoutIntro from "@/components/Home/HomeWithoutIntro";
 
-// Componente interno que usa useSearchParams
-function HomeContent() {
-  // Este componente será renderizado apenas no cliente
-  const [isClient, setIsClient] = React.useState(false);
-  
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
-  
-  if (!isClient) {
-    return <div className="w-screen h-screen flex items-center justify-center bg-black text-white">Carregando...</div>;
-  }
-  
-  // Verificando URL para skipIntro
-  const urlParams = new URLSearchParams(window.location.search);
-  const skipIntro = urlParams.get('skipIntro') === 'true';
-  
+export default function Home() {
+  const searchParams = useSearchParams();
+  const skipIntro = searchParams?.get('skipIntro');
+  const shouldSkipIntro = skipIntro === "true";
+
+  console.log("Página Principal Renderizada");
+  console.log("skipIntro:", skipIntro);
+  console.log("shouldSkipIntro:", shouldSkipIntro);
+
   return (
     <>
-      {skipIntro ? (
+      {shouldSkipIntro ? (
         <HomeWithoutIntro />
       ) : (
         <HomeWithIntro />
       )}
     </>
-  );
-}
-
-// Componente principal
-export default function Home() {
-  return (
-    <Suspense fallback={<div className="w-screen h-screen flex items-center justify-center bg-black text-white">Carregando...</div>}>
-      <HomeContent />
-    </Suspense>
   );
 }

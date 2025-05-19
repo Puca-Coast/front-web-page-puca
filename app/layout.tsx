@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${jura.variable}`}>
         <ApiProvider>
-          <CartProvider>{children}</CartProvider>
+        <CartProvider>{children}</CartProvider>
         </ApiProvider>
       </body>
     </html>

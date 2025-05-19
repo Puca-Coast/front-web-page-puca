@@ -17,44 +17,29 @@ interface CarouselApiResponse {
   error?: string;
 }
 
-interface CarouselHomeProps {
-  carouselHeight?: string;
-}
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 console.log(API_BASE_URL);
-export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
+export default function CarouselHome() {
   const [photos, setPhotos] = useState<LookbookPhoto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isMounted, setIsMounted] = useState(false);
 
   // Tenta recuperar do cache; se não houver, faz o fetch
   useEffect(() => {
-    setIsMounted(true);
-    
-    const loadFromCache = () => {
-      if (typeof window === 'undefined' || !window.localStorage) return false;
-      
-      const cached = localStorage.getItem("carouselPhotos");
-      if (cached) {
-        try {
-          const parsedData = JSON.parse(cached);
-          if (Array.isArray(parsedData) && parsedData.length > 0) {
-            setPhotos(parsedData);
-            setLoading(false);
-            return true;
-          }
-        } catch (e) {
-          // Se houver erro no parsing, apenas continua e busca os dados novamente
-          console.log("Cache inválido, buscando novos dados");
+    const cached = localStorage.getItem("carouselPhotos");
+    if (cached) {
+      try {
+        const parsedData = JSON.parse(cached);
+        if (Array.isArray(parsedData) && parsedData.length > 0) {
+          setPhotos(parsedData);
+      setLoading(false);
+          return;
         }
+      } catch (e) {
+        // Se houver erro no parsing, apenas continua e busca os dados novamente
+        console.log("Cache inválido, buscando novos dados");
       }
-      return false;
-    };
-    
-    if (!loadFromCache()) {
-      fetchLookbookPhotos();
     }
+      fetchLookbookPhotos();
   }, []);
 
   async function fetchLookbookPhotos() {
@@ -66,10 +51,8 @@ export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
       if (data.success) {
         setPhotos(data.data);
         // Salva no cache com expiração de 1 hora
-        if (typeof window !== 'undefined' && window.localStorage) {
-          localStorage.setItem("carouselPhotos", JSON.stringify(data.data));
-          localStorage.setItem("carouselPhotosExpiry", String(Date.now() + 3600000));
-        }
+        localStorage.setItem("carouselPhotos", JSON.stringify(data.data));
+        localStorage.setItem("carouselPhotosExpiry", String(Date.now() + 3600000));
       } else {
         console.error("Erro ao buscar fotos:", data.error);
       }
@@ -92,8 +75,6 @@ export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
 
   // Função de animação com requestAnimationFrame
   const animate = () => {
-    if (typeof window === 'undefined') return;
-    
     xRef.current += speed;
     if (xRef.current >= halfTrackWidth) {
       xRef.current = 0;
@@ -105,31 +86,22 @@ export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
   };
 
   useEffect(() => {
-    if (!isMounted) return;
-    
     // Inicia a animação
     requestRef.current = requestAnimationFrame(animate);
     return () => {
-      if (requestRef.current && typeof window !== 'undefined') {
-        cancelAnimationFrame(requestRef.current);
-      }
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
     };
     // Dependência: se as fotos mudarem, o loop será reiniciado
-  }, [photos, speed, isMounted]);
+  }, [photos, speed]);
 
   // Ao passar o mouse, reduz a velocidade
   const handleMouseEnter = () => setSpeed(0.1);
   // Ao sair, restaura a velocidade original
   const handleMouseLeave = () => setSpeed(0.5);
 
-  if (!isMounted) {
-    return <div style={{ height: carouselHeight || '300px' }}></div>;
-  }
-
   return (
     <div
-      className="marquee-container relative w-full bg-white"
-      style={{ height: carouselHeight || '300px' }}
+      className="marquee-container relative w-full bg-white h-[300px]"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
