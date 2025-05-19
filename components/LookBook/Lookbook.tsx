@@ -21,8 +21,6 @@ export default function LookbookPage() {
 
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
   // Função para buscar as fotos (com paginação)
   const fetchPhotos = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -30,7 +28,7 @@ export default function LookbookPage() {
 
     try {
       // Chame sua API (AJUSTE O ENDPOINT CONFORME NECESSÁRIO)
-      const res = await fetch(`${API_BASE_URL}/api/lookbook/photos?page=${page}&limit=10`);
+      const res = await fetch(`http://localhost:3000/api/lookbook/photos?page=${page}&limit=10`);
       const data = await res.json();
 
       if (data.success) {

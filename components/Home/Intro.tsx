@@ -11,9 +11,6 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
   const introRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLImageElement>(null);
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-  console.log(API_BASE_URL);
-
   useEffect(() => {
     // Animação de entrada da logo
     anime({
@@ -43,7 +40,7 @@ const Intro: React.FC<IntroProps> = ({ onComplete }) => {
       if (localStorage.getItem("carouselPhotos")) return;
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/lookbook/photos?launch=primavera2024&limit=10`
+          "http://localhost:3000/api/lookbook/photos?launch=primavera2024&limit=10"
         );
         const data = await response.json();
         if (data.success) {

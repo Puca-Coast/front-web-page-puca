@@ -4,21 +4,12 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import "../../styles/carouselStyles.css"; // CSS específico para o marquee
 import WavyLoader from "../WavyLoader";    // Seu componente de loader
-import { get } from "@/app/utils/api";
 
 interface LookbookPhoto {
   url: string;
   description?: string;
 }
 
-interface CarouselApiResponse {
-  success: boolean;
-  data: LookbookPhoto[];
-  error?: string;
-}
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-console.log(API_BASE_URL);
 export default function CarouselHome() {
   const [photos, setPhotos] = useState<LookbookPhoto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,32 +18,22 @@ export default function CarouselHome() {
   useEffect(() => {
     const cached = localStorage.getItem("carouselPhotos");
     if (cached) {
-      try {
-        const parsedData = JSON.parse(cached);
-        if (Array.isArray(parsedData) && parsedData.length > 0) {
-          setPhotos(parsedData);
+      setPhotos(JSON.parse(cached));
       setLoading(false);
-          return;
-        }
-      } catch (e) {
-        // Se houver erro no parsing, apenas continua e busca os dados novamente
-        console.log("Cache inválido, buscando novos dados");
-      }
-    }
+    } else {
       fetchLookbookPhotos();
+    }
   }, []);
 
   async function fetchLookbookPhotos() {
     try {
-      const data = await get<CarouselApiResponse>(
-        `/api/lookbook/photos?launch=primavera2024&limit=10`
+      const response = await fetch(
+        "http://localhost:3000/api/lookbook/photos?launch=primavera2024&limit=10"
       );
-      
+      const data = await response.json();
       if (data.success) {
         setPhotos(data.data);
-        // Salva no cache com expiração de 1 hora
         localStorage.setItem("carouselPhotos", JSON.stringify(data.data));
-        localStorage.setItem("carouselPhotosExpiry", String(Date.now() + 3600000));
       } else {
         console.error("Erro ao buscar fotos:", data.error);
       }

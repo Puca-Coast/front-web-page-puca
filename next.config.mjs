@@ -1,38 +1,20 @@
 /** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-        pathname: '/dgsigv8cf/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'puca-api.vercel.app',
-        pathname: '/**',
-      }
-    ],
-    domains: [
-      'localhost',
-      'puca-api.vercel.app'
-    ],
-    unoptimized: true,
-  },
-  async headers() {
-    return [
-      {
-        source: '/api/:path*',
-        headers: [
-          { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT' },
-          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization' },
-        ],
-      },
-    ];
-  },
-};
-
-export default nextConfig;
+    images: {
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'res.cloudinary.com',
+          pathname: '/dgsigv8cf/**', // Substitua pelo seu nome de pasta no Cloudinary
+        },
+      ],
+      domains: ['localhost',
+        'puca-api.vercel.app'
+      ],
+      unoptimized: true,
+    },
+  };
+  
+  export default nextConfig;
   
