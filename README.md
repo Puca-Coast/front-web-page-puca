@@ -1,63 +1,107 @@
-# Nome do Projeto
+# Puca Coast - E-commerce frontend
 
-## Utilitários Necessários
+## Sobre o Projeto
 
-### Configuração do NVM
+Puca Coast é uma aplicação de e-commerce para uma marca de roupas, desenvolvida com Next.js, React e TypeScript. O projeto segue as melhores práticas de desenvolvimento web de 2025, com foco em segurança, arquitetura escalável e manutenibilidade.
 
-Primeiro, você precisa baixar e configurar o NVM. Se você estiver usando Windows, baixe o "nvm for windows". Se estiver usando Linux, baixe o "nvm for linux".
+## Estrutura do Projeto
 
-Depois de baixar o NVM, abra o terminal do Visual Studio Code e execute os seguintes comandos:
+A estrutura de pastas foi organizada seguindo padrões de mercado para maior escalabilidade e manutenibilidade:
 
-```bash
-nvm install 21
-nvm use 21
-
-A partir daqui, seu Node.js será configurado para a versão mais atual.
-
-Instalação do Yarn
-Você também precisará do Yarn. Se ainda não o tiver instalado, faça o download. Depois de baixar o Yarn, no terminal, tente executar o seguinte comando para baixar os pacotes:
-
-yarn install
-
-Executando o Projeto
-Depois de concluir as etapas acima, você pode iniciar o projeto com um dos seguintes comandos (um deles deve funcionar):
-
-yarn dev
-
-Seja feliz codando!
-
-Espero que isso ajude! Se você precisar de mais alguma coisa, é só me avisar.
-
-
-
-
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-yarn dev
+```
+front-web-page-puca/
+├── src/                        # Pasta raiz para código-fonte
+│   ├── app/                    # App router do Next.js
+│   │   ├── (auth)/             # Grupo de rotas autenticadas
+│   │   │   ├── profile/        # Rotas relacionadas ao perfil 
+│   │   │   └── admin/          # Rotas de administração
+│   │   ├── (public)/           # Grupo de rotas públicas
+│   │   └── layout.tsx          # Layout raiz da aplicação
+│   ├── components/             # Componentes React
+│   │   ├── common/             # Componentes globais reutilizáveis
+│   │   ├── features/           # Componentes organizados por feature
+│   │   ├── layout/             # Componentes de layout (Header, Footer)
+│   │   └── ui/                 # Componentes de UI básicos 
+│   ├── lib/                    # Código utilitário e de terceiros
+│   │   ├── services/           # Serviços de API
+│   │   ├── hooks/              # Custom hooks
+│   │   ├── utils/              # Funções utilitárias
+│   │   └── types/              # Definições de tipos TypeScript
+│   ├── contexts/               # Contextos React
+│   ├── styles/                 # Estilos globais
+│   └── middleware.ts           # Middleware para proteção de rotas
+├── public/                     # Arquivos estáticos
+└── config/                     # Configurações de projeto
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Características Implementadas
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Arquitetura Moderna**: Serviços de API centralizados, hooks personalizados, isolamento de responsabilidades.
+- **Segurança**: Middleware de proteção de rotas, cookies seguros, validação de dados.
+- **Performance**: Hooks de debounce, otimização de requisições.
+- **Manutenibilidade**: Código documentado, serviços especializados, padrões consistentes.
+- **Organização por Features**: Componentes organizados por domínio de negócio (DDD).
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Configuração do Ambiente de Desenvolvimento
 
-## Learn More
+### Pré-requisitos
 
-To learn more about Next.js, take a look at the following resources:
+- Node.js v21 ou superior
+- Yarn v4 ou superior
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Instalação
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+1. Clone o repositório:
+   ```bash
+   git clone [url-do-repositorio]
+   cd front-web-page-puca
+   ```
 
-## Deploy on Vercel
+2. Execute o script de setup para instalar as dependências necessárias:
+   ```bash
+   chmod +x setup.sh
+   ./setup.sh
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Execute o servidor de desenvolvimento:
+   ```bash
+   yarn dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+4. Abra [http://localhost:3000](http://localhost:3000) no navegador para ver a aplicação.
+
+## Endpoints de API
+
+A aplicação se comunica com os seguintes endpoints da API:
+
+### Autenticação
+- **Login**: `POST /api/auth/login`
+- **Registro**: `POST /api/auth/register`
+- **Perfil**: `GET /api/auth/profile`
+- **Admin**: `GET /api/auth/admin`
+
+### Produtos
+- **Listagem**: `GET /api/products`
+- **Detalhes**: `GET /api/products/:id`
+- **Busca**: `GET /api/products/search/name`
+- **Criar**: `POST /api/products`
+- **Atualizar**: `PUT /api/products/:id`
+- **Excluir**: `DELETE /api/products/:id`
+
+### Lookbook
+- **Listagem**: `GET /api/lookbook/photos`
+- **Adicionar**: `POST /api/lookbook/photos`
+- **Atualizar**: `PUT /api/lookbook/photos/:id`
+- **Excluir**: `DELETE /api/lookbook/photos/:id`
+
+## Próximos Passos
+
+Para mais informações sobre o que foi feito e o que ainda precisa ser implementado, consulte o arquivo [DOCUMENTATION.md](./DOCUMENTATION.md).
+
+## Contribuição
+
+1. Faça o fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Faça commit das suas alterações (`git commit -m 'Adiciona nova feature'`)
+4. Faça push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request

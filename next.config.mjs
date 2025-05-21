@@ -9,9 +9,7 @@ const nextConfig = {
           pathname: '/dgsigv8cf/**', // Substitua pelo seu nome de pasta no Cloudinary
         },
       ],
-      domains: ['localhost',
-        'puca-api.vercel.app'
-      ],
+      domains: ['localhost'],
       unoptimized: true,
     },
   };

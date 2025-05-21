@@ -18,7 +18,13 @@
     "incremental": true,
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
+      ],
+      "@/config/*": [
+        "./config/*"
+      ],
+      "@/public/*": [
+        "./public/*"
       ]
     },
     "plugins": [
