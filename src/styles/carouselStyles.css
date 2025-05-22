@@ -222,6 +222,13 @@
   position: relative;
   height: 100%;
   flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.marquee-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
 /* Exemplo de estilo para o loader (caso precise de um spinner básico) */
@@ -237,4 +244,40 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Estilos para o efeito de blur nas imagens */
+.blur-transition {
+  transition: filter 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.blur-image {
+  filter: blur(8px);
+  transform: scale(1.05);
+}
+
+.no-blur {
+  filter: blur(0);
+  transform: scale(1);
+}
+
+/* Ajustar animação de carregamento para ser mais suave */
+.swiper-lazy-preloader {
+  animation-duration: 1.5s !important;
+}
+
+/* Transição suave do carrossel */
+.carousel-fade-in {
+  animation: fadeInCarousel 1s ease-in-out;
+}
+
+@keyframes fadeInCarousel {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

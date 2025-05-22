@@ -29,7 +29,7 @@ export default function Header({ isHome }: { isHome: boolean }) {
           headerRef.current.style.display = "flex";
           setIsVisible(true);
         }
-      }, 6000);
+      }, 600);
       return () => clearTimeout(timer);
     } else {
       if (headerRef.current) {

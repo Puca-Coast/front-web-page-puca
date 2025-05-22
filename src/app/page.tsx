@@ -2,10 +2,9 @@
 
 import React from "react";
 import { useSearchParams } from "next/navigation";
-import HomeWithIntro from "@/components/features/home/HomeWithIntro";
-import HomeWithoutIntro from "@/components/features/home/HomeWithoutIntro";
+import Home from "@/components/features/home/Home";
 
-export default function Home() {
+export default function HomePage() {
   const searchParams = useSearchParams();
   const skipIntro = searchParams?.get('skipIntro');
   const shouldSkipIntro = skipIntro === "true";
@@ -14,13 +13,5 @@ export default function Home() {
   console.log("skipIntro:", skipIntro);
   console.log("shouldSkipIntro:", shouldSkipIntro);
 
-  return (
-    <>
-      {shouldSkipIntro ? (
-        <HomeWithoutIntro />
-      ) : (
-        <HomeWithIntro />
-      )}
-    </>
-  );
+  return <Home showIntro={!shouldSkipIntro} />;
 } 

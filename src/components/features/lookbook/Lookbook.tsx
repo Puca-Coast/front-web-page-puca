@@ -32,7 +32,7 @@ export default function LookbookPage() {
       const data = await res.json();
 
       if (data.success) {
-        // Para cada foto, carregamos a imagem para obter width e height
+        // Para cada foto, criamos um objeto com as dimensões proporcionais
         const newPhotos: LookbookPhoto[] = await Promise.all(
           data.data.map(async (photo: any) => {
             const img = new window.Image();
@@ -102,17 +102,28 @@ export default function LookbookPage() {
       <div className="flex-1 w-full max-w-screen-xl mx-auto px-4">
         {/* Mosaico */}
         <div className="masonry-grid mt-8">
-          {photos.map((photo) => (
+          {photos.map((photo, index) => (
             <div key={photo.id} className="masonry-item">
-              <Image
-                src={photo.src}
-                alt="Lookbook Photo"
-                width={photo.width}
-                height={photo.height}
-                layout="responsive"
-                objectFit="cover"
-                loading="lazy"
-              />
+              <div 
+                className="relative w-full" 
+                style={{ aspectRatio: `${photo.width} / ${photo.height}` }}
+              >
+                <Image
+                  src={photo.src}
+                  alt="Lookbook Photo"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover"
+                  priority={index < 3} // Priorizar apenas as primeiras 3 imagens
+                  onLoad={(event) => {
+                    // Adicione comportamentos adicionais quando a imagem carregar, se necessário
+                    const target = event.target as HTMLImageElement;
+                    if (target.complete) {
+                      // Imagem carregada com sucesso
+                    }
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>

@@ -11,13 +11,13 @@ export default function Footer(props) {
 
   useEffect(() => {
     if (isHome) {
-      // Define o timer para exibir o footer após 6 segundos
+      // Define o timer para exibir o footer após 600ms
       const timer = setTimeout(() => {
         if (footerRef.current) {
           footerRef.current.style.display = "flex";
           setIsVisible(true);
         }
-      }, 6000);
+      }, 600);
 
       return () => clearTimeout(timer); // Limpa o timer quando o componente desmonta
     } else {

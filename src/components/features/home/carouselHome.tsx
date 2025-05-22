@@ -1,20 +1,26 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import "@/styles/carouselStyles.css"; // CSS específico para o marquee
-import WavyLoader from "@/components/ui/WavyLoader";    // Seu componente de loader
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, EffectFade } from "swiper/modules";
+import { useInView } from "react-intersection-observer";
+import WavyLoader from "@/components/ui/WavyLoader";
+import { LookbookPhoto, CarouselHomeProps } from "@/types";
 
-interface LookbookPhoto {
-  url: string;
-  description?: string;
-}
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/autoplay";
+import "swiper/css/effect-fade";
+import "@/styles/carouselStyles.css";
 
-export default function CarouselHome() {
+// Custom hook para buscar e gerenciar as fotos
+function useLookbookPhotos() {
   const [photos, setPhotos] = useState<LookbookPhoto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [preloaded, setPreloaded] = useState(false);
 
-  // Tenta recuperar do cache; se não houver, faz o fetch
+  // Buscar fotos do cache ou API
   useEffect(() => {
     const cached = localStorage.getItem("carouselPhotos");
     if (cached && cached !== '[]') {
@@ -24,6 +30,31 @@ export default function CarouselHome() {
       fetchLookbookPhotos();
     }
   }, []);
+
+  // Pré-carregar imagens para evitar atrasos na exibição
+  useEffect(() => {
+    if (photos.length > 0 && !preloaded) {
+      const preloadImages = async () => {
+        const imagePromises = photos.slice(0, 5).map((photo) => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = photo.url;
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+          });
+        });
+
+        try {
+          await Promise.all(imagePromises);
+          setPreloaded(true);
+        } catch (error) {
+          console.error("Erro ao pré-carregar imagens:", error);
+        }
+      };
+
+      preloadImages();
+    }
+  }, [photos, preloaded]);
 
   async function fetchLookbookPhotos() {
     try {
@@ -44,45 +75,77 @@ export default function CarouselHome() {
     }
   }
 
-  // Configurações de animação
-  const trackRef = useRef<HTMLDivElement>(null);
-  const requestRef = useRef<number>(0);
-  const xRef = useRef<number>(0);
-  const [speed, setSpeed] = useState<number>(0.5); // velocidade em pixels por frame
-  const SLIDE_WIDTH = 300; // largura fixa de cada slide (em pixels)
+  return { photos, loading, preloaded };
+}
 
-  // Metade do comprimento do track (necessário para o loop)
-  const halfTrackWidth = photos.length * SLIDE_WIDTH;
+// Componente para imagem com blur lazy-loading
+const BlurImage = ({ photo, index, inViewport }) => {
+  const [loaded, setLoaded] = useState(false);
+  const { ref, inView } = useInView({
+    triggerOnce: false,
+    threshold: 0.1,
+  });
+  
+  const handleLoad = useCallback(() => {
+    setLoaded(true);
+  }, []);
 
-  // Função de animação com requestAnimationFrame
-  const animate = () => {
-    xRef.current += speed;
-    if (xRef.current >= halfTrackWidth) {
-      xRef.current = 0;
-    }
-    if (trackRef.current) {
-      trackRef.current.style.transform = `translateX(-${xRef.current}px)`;
-    }
-    requestRef.current = requestAnimationFrame(animate);
-  };
-
-  useEffect(() => {
-    // Inicia a animação
-    requestRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
-    };
-    // Dependência: se as fotos mudarem, o loop será reiniciado
-  }, [photos, speed]);
-
-  // Ao passar o mouse, reduz a velocidade
-  const handleMouseEnter = () => setSpeed(0.1);
-  // Ao sair, restaura a velocidade original
-  const handleMouseLeave = () => setSpeed(0.5);
+  const isVisible = inView || inViewport;
 
   return (
-    <div
-      className="marquee-container relative w-full bg-white h-[300px]"
+    <div 
+      ref={ref} 
+      className={`relative w-full h-full overflow-hidden transition-all duration-500 ease-in-out ${
+        loaded ? '' : 'bg-gray-200'
+      }`}
+    >
+      <Image
+        src={photo.url}
+        alt={photo.description || `Imagem ${index + 1}`}
+        fill
+        sizes="300px"
+        className={`object-cover transition-all duration-500 blur-transition ${
+          isVisible 
+            ? loaded 
+              ? 'no-blur' 
+              : 'blur-image'
+            : 'blur-image'
+        }`}
+        priority={index < 4}
+        onLoad={handleLoad}
+      />
+    </div>
+  );
+};
+
+export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
+  const { photos, loading, preloaded } = useLookbookPhotos();
+  const [visibleSlides, setVisibleSlides] = useState([]);
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: false,
+  });
+  
+  const [speed, setSpeed] = useState(5000); // Velocidade do slide em ms
+
+  // Gerenciar velocidade do carrossel com hover
+  const handleMouseEnter = () => setSpeed(15000); // Mais lento no hover
+  const handleMouseLeave = () => setSpeed(5000); // Velocidade normal ao sair
+  
+  const handleSlideChange = (swiper) => {
+    if (swiper && swiper.visibleSlides) {
+      const visibleIndices = swiper.visibleSlides.map(slide => 
+        parseInt(slide.getAttribute('data-swiper-slide-index'), 10)
+      );
+      setVisibleSlides(visibleIndices);
+    }
+  };
+
+  return (
+    <div 
+      ref={ref} 
+      className="marquee-container relative w-full bg-white transition-opacity duration-1000 ease-in-out"
+      style={{ height: carouselHeight || "300px", opacity: preloaded ? 0.3 : 1 }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -92,25 +155,45 @@ export default function CarouselHome() {
         </div>
       )}
 
-      <div className="marquee-wrapper">
-        <div ref={trackRef} className="marquee-track">
-          {/* Duplicamos as fotos para criar o loop infinito */}
-          {photos.concat(photos).map((photo, index) => (
-            <div
-              key={index}
+      {!loading && photos.length > 0 && (
+        <Swiper
+          modules={[Autoplay, EffectFade]}
+          spaceBetween={0}
+          slidesPerView="auto"
+          loop={true}
+          autoplay={{
+            delay: 0,
+            disableOnInteraction: false,
+            stopOnLastSlide: false,
+            waitForTransition: true,
+            reverseDirection: false,
+          }}
+          speed={speed}
+          centeredSlides={false}
+          allowTouchMove={true}
+          grabCursor={true}
+          freeMode={true}
+          className="h-full marquee-wrapper carousel-fade-in"
+          onSlideChange={handleSlideChange}
+          onImagesReady={() => setVisibleSlides([])}
+        >
+          {/* Duplicamos as fotos para criar o efeito de loop infinito similar ao original */}
+          {[...photos, ...photos].map((photo, index) => (
+            <SwiperSlide
+              key={`${photo._id || 'photo'}-${index}`}
               className="marquee-item"
-              style={{ width: SLIDE_WIDTH, height: "100%" }}
+              style={{ width: "900px", height: "100%" }}
+              data-swiper-slide-index={index % photos.length}
             >
-              <Image
-                src={photo.url}
-                alt={photo.description || `Imagem ${index + 1}`}
-                fill
-                className="object-cover"
+              <BlurImage 
+                photo={photo} 
+                index={index}
+                inViewport={visibleSlides.includes(index % photos.length)}
               />
-            </div>
+            </SwiperSlide>
           ))}
-        </div>
-      </div>
+        </Swiper>
+      )}
     </div>
   );
 }

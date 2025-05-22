@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import "@/styles/lookbookStyles.css"; // Importa o CSS global do masonry
+import "@/styles/lookbookStyles.css";
+import { API_BASE_URL } from "@/config/environment";
 
-// Tipagem simples para cada foto
 interface LookbookPhoto {
   id: string;
   src: string;
@@ -20,124 +20,131 @@ export default function LookbookPage() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Ref do "sentinela" para IntersectionObserver
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  // Função para buscar fotos (paginação)
-  const fetchPhotos = useCallback(async () => {
-    if (isLoading || !hasMore) return;
-    setIsLoading(true);
+  /* ---------------------- FETCH ---------------------- */
+  const fetchPhotos = useCallback(
+    async (pageToFetch: number) => {
+      if (!hasMore) return;
+      setIsLoading(true);
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/lookbook/photos?page=${pageToFetch}&limit=10`);
 
-    try {
-      const res = await fetch(
-        `http://localhost:3000/api/lookbook/photos?page=${page}&limit=10`
-      );
-      const data = await res.json();
+        // 1) Qualquer status 4xx/5xx encerra paginação
+        if (!res.ok) {
+          console.warn(`Stop paging: server returned ${res.status}`);
+          setHasMore(false);
+          return;
+        }
 
-      if (data.success) {
-        // Carrega cada imagem para obter width/height corretos
+        const data = await res.json();
+
+        // 2) Se API sinalizar erro ou vier vazia, também paramos
+        if (!data.success || data.data.length === 0) {
+          setHasMore(false);
+          return;
+        }
+
         const newPhotos: LookbookPhoto[] = await Promise.all(
-          data.data.map(async (photo: any) => {
-            const img = new window.Image();
-            img.src = photo.url;
-            await new Promise((resolve) => {
-              img.onload = resolve;
-            });
-            return {
-              id: photo._id,
-              src: photo.url,
-              width: img.width,
-              height: img.height,
-            };
-          })
+          data.data.map(
+            (photo: any) =>
+              new Promise<LookbookPhoto>((resolve) => {
+                const img = new window.Image();
+                img.src = photo.url;
+                img.onload = () =>
+                  resolve({
+                    id: photo._id,
+                    src: photo.url,
+                    width: img.width,
+                    height: img.height,
+                  });
+              })
+          )
         );
 
-        // Adiciona as novas fotos ao estado
-        setPhotos((prev) => [...prev, ...newPhotos]);
-        setPage((prev) => prev + 1);
-
-        // Se chegamos à última página
-        if (data.pagination.currentPage >= data.pagination.totalPages) {
-          setHasMore(false);
-        }
-      } else {
-        console.error("Erro ao buscar fotos:", data.error);
-      }
-    } catch (error) {
-      console.error("Erro ao conectar com a API:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [page, isLoading, hasMore]);
-
-  // IntersectionObserver para carregar a próxima página antes do final
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [entry] = entries;
-      if (entry.isIntersecting && hasMore) {
-        fetchPhotos();
+        // -------- deduplicação --------
+        setPhotos((prev) => {
+          const ids = new Set(prev.map((p) => p.id));
+          const unique = newPhotos.filter((p) => !ids.has(p.id));
+          return [...prev, ...unique];
+        });
+      } catch (err) {
+        console.error("Fetch failed:", err);
+        setHasMore(false); // falha de rede => não tente de novo
+      } finally {
+        setIsLoading(false);
       }
     },
-    [fetchPhotos, hasMore]
+    [hasMore]
+  );
+
+  /* ---------------- INTERSECTION OBSERVER ------------- */
+  const onIntersect = useCallback(
+    ([entry]: IntersectionObserverEntry[]) => {
+      if (entry.isIntersecting && hasMore && !isLoading) {
+        setPage((prev) => prev + 1);
+      }
+    },
+    [hasMore, isLoading]
   );
 
   useEffect(() => {
-    // Configura o IntersectionObserver
-    const observer = new IntersectionObserver(handleObserver, {
+    const io = new IntersectionObserver(onIntersect, {
       root: null,
-      rootMargin: "600px", // carrega antes de chegar ao fim
+      rootMargin: "600px",
       threshold: 0.1,
     });
+    if (observerRef.current) io.observe(observerRef.current);
+    return () => io.disconnect();
+  }, [onIntersect]);
 
-    if (observerRef.current) observer.observe(observerRef.current);
-
-    return () => {
-      if (observerRef.current) observer.unobserve(observerRef.current);
-    };
-  }, [handleObserver]);
-
-  // Busca a primeira página ao montar
+  /* ---------------- BUSCA INICIAL + PAGE -------------- */
   useEffect(() => {
-    fetchPhotos();
-  }, [fetchPhotos]);
+    fetchPhotos(page);
+  }, [page, fetchPhotos]);
 
+  /* --------------------- RENDER ----------------------- */
   return (
     <div className="min-h-screen flex flex-col">
       <Header isHome={false} />
 
-      {/* Container do conteúdo */}
-      <div className="flex-1 w-full mx-auto px-4 pt-20">
-        {/* Mosaico */}
+      <main className="flex-1 w-full mx-auto px-4 pt-20">
         <div className="masonry-grid">
           {photos.map((photo) => (
             <PhotoCard key={photo.id} photo={photo} />
           ))}
         </div>
-
-        {/* Sentinela do IntersectionObserver */}
         <div ref={observerRef} className="h-10" />
-      </div>
+      </main>
 
       <Footer isHome={false} />
 
       {isLoading && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2">
-          <div className="spinner-border animate-spin w-8 h-8 border-4 rounded-full text-blue-500"></div>
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2">
+          <span className="spinner" />
         </div>
       )}
 
       <style jsx>{`
-        .spinner-border {
-          border-color: #ccc;
+        .spinner {
+          width: 2rem;
+          height: 2rem;
+          border: 4px solid #ccc;
           border-top-color: #3498db;
           border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </div>
   );
 }
 
-// Componente de cada foto, com fade-in e placeholder
+/* --------------------- CARD ------------------------- */
 function PhotoCard({ photo }: { photo: LookbookPhoto }) {
   const [loaded, setLoaded] = useState(false);
 
@@ -145,22 +152,15 @@ function PhotoCard({ photo }: { photo: LookbookPhoto }) {
     <div className="masonry-item">
       <Image
         src={photo.src}
-        alt="Lookbook Photo"
+        alt=""
         width={photo.width}
         height={photo.height}
-        layout="responsive"
-        objectFit="cover"
-        loading="lazy"       // lazy loading
-        decoding="async"
-        placeholder="blur"   // placeholder de blur
-        blurDataURL="/assets/placeholder.png"
-        sizes="(max-width: 640px) 100vw,
-               (max-width: 1024px) 50vw,
-               33vw"
-        onLoadingComplete={() => setLoaded(true)}
-        className={`rounded-md transition-opacity duration-700 ${
+        sizes="(max-width:640px)100vw, (max-width:1024px)50vw, 33vw"
+        placeholder="blur"
+        blurDataURL="/placeholder.png"
+        onLoad={() => setLoaded(true)}
+        className={`rounded-md object-cover transition-opacity duration-700 ${
           loaded ? "opacity-100" : "opacity-0"
-          
         }`}
       />
     </div>

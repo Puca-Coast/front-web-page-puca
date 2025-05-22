@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "install-types": "yarn add -D @types/react @types/react-dom @types/node"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.14",
