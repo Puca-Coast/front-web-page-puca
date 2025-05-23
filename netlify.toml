@@ -19,22 +19,22 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "default-src 'self'; img-src 'self' data: https://res.cloudinary.com https://puca-api.vercel.app; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' https://puca-api.vercel.app;" 
 
-# Redirecionar para rotas dinâmicas de produtos
+# Redirecionamentos específicos para rotas dinâmicas de produtos
 [[redirects]]
   from = "/product/*"
   to = "/product/[id].html"
   status = 200
-  force = false
-
-# Redirecionamento fallback para SPA 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  force = true
 
 # Redirecionamentos para rotas de API
 [[redirects]]
   from = "/api/*"
   to = "https://puca-api.vercel.app/api/:splat"
   status = 200
-  force = true 
+  force = true
+
+# Redirecionamento fallback para SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200 
