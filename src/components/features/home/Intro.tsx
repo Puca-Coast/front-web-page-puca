@@ -18,7 +18,6 @@ export default function Intro({ onComplete }: IntroProps) {
       // 1. Buscar dados das imagens se não estiverem em cache
       if (!localStorage.getItem("carouselPhotos")) {
         try {
-          console.log("Buscando fotos do carousel na Intro...");
           const response = await fetch(
             "http://localhost:3000/api/lookbook/photos?launch=primavera2024&limit=10"
           );
@@ -26,7 +25,6 @@ export default function Intro({ onComplete }: IntroProps) {
           
           if (data.success) {
             localStorage.setItem("carouselPhotos", JSON.stringify(data.data));
-            console.log("Fotos armazenadas no cache");
             
             // 2. Pré-carregar pelo menos 3 imagens
             const preloadImages = async () => {
@@ -80,7 +78,7 @@ export default function Intro({ onComplete }: IntroProps) {
       const completeTimer = setTimeout(() => {
         setIntroState('complete');
         onComplete();
-      }, 1000);
+      }, 1500);
       
       return () => clearTimeout(completeTimer);
     }

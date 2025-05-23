@@ -12,9 +12,11 @@ const MainContent: FC<MainContentProps> = ({ isHome }) => {
 
   // Calcula a altura disponível para o carousel
   const carouselHeight = `calc(100vh - ${headerHeight}px - ${footerHeight}px)`;
-
+  console.log(isHome);
   return (
-    <div className="w-full h-screen flex flex-col overflow-hidden">
+    <div
+      className={`w-full h-screen flex flex-col ${isHome ? "overflow-hidden" : ""}`}
+    >
       <Header isHome={isHome} />
 
       <div

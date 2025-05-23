@@ -43,6 +43,31 @@
 }
 }
 
+/* Compensação para o header fixo */
+.header-offset {
+  padding-top: 70px; /* Ajuste este valor conforme a altura do seu header */
+}
+
+/* Ensure proper layout structure */
+body {
+  padding-top: 0; /* Remover qualquer padding que possa interferir */
+  margin: 0;
+}
+
+/* Fix for layout in product pages - preserves the column structure */
+.product-layout-container {
+  min-height: calc(100vh - 70px); /* Ajustado para a altura do header */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Layout fix for additional pages that might break */
+.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 @keyframes energyPulse {
   0% {
     background-color: #ef4444; /* Vermelho */

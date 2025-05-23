@@ -4,6 +4,7 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --header-height: 70px; /* Define a altura do header para cálculos consistentes */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -14,9 +15,39 @@
   }
 }
 
+/* Estilos base para o corpo da página */
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 body {
-  width: 100vw;
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Estrutura principal de layout para compensar o header fixo */
+main {
+  flex: 1 0 auto;
+  padding-top: var(--header-height);
+  min-height: calc(100vh - var(--header-height));
+}
+
+/* Classes utilitárias para ajustar padding-top em elementos que não estão no main */
+.header-offset {
+  padding-top: var(--header-height);
+}
+
+/* Container principal em páginas dinâmicas (como a do produto) */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: calc(100vh - var(--header-height));
 }
 
 @layer utilities {
@@ -28,6 +59,7 @@ body {
 html {
   font-family: var('--font-jura');
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 /* Hover suave nos ícones de redes sociais */
@@ -38,11 +70,6 @@ html {
 
 .social-icons a:hover img {
   filter: brightness(1.2);
-}
-
-/* Scroll suave */
-html {
-  scroll-behavior: smooth;
 }
 
 /* Preloader */

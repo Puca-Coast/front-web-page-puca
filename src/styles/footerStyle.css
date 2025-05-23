@@ -5,4 +5,27 @@
   color: #9B9494;
 }
 
-/* Estilos adicionais para responsividade e interações */
+/* Modern hover effects */
+.footerContent a:hover {
+  color: #333;
+  transform: translateY(-2px);
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Layout para footer dinâmico - removido configurações de layout conflitantes */
+footer {
+  flex-shrink: 0;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .footerContent {
+    text-align: center;
+  }
+}
+
+/* Social media icon effects */
+footer .text-gray-500:hover {
+  transform: scale(1.2);
+}

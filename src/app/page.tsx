@@ -9,9 +9,5 @@ export default function HomePage() {
   const skipIntro = searchParams?.get('skipIntro');
   const shouldSkipIntro = skipIntro === "true";
 
-  console.log("Página Principal Renderizada");
-  console.log("skipIntro:", skipIntro);
-  console.log("shouldSkipIntro:", shouldSkipIntro);
-
   return <Home showIntro={!shouldSkipIntro} />;
 } 

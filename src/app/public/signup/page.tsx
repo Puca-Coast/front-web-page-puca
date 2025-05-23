@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import InputMask from "react-input-mask"; // Para máscara de celular
+import { InputMask } from "@react-input/mask"; // Nova biblioteca de máscara compatível com React 18
 
 const API_BASE_URL = "http://localhost:3000"; // Ajuste se necessário
 
@@ -71,7 +71,7 @@ export default function Signup() {
   };
 
   // Função para lidar com o envio do formulário (Signup)
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!validarFormulario()) {
@@ -212,22 +212,15 @@ export default function Signup() {
               </label>
               <InputMask
                 mask="(99) 99999-9999"
+                replacement={{ '9': /\d/ }}
                 value={celular}
                 onChange={(e) => setCelular(e.target.value)}
-              >
-                {(inputProps: any) => (
-                  <input
-                    type="tel"
-                    id="celular"
-                    {...inputProps}
-                    className={`w-full px-3 py-2 border ${
-                      errors.celular ? "border-red-500" : "border-gray-300"
-                    } rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500`}
-                    placeholder="(00) 00000-0000"
-                    required
-                  />
-                )}
-              </InputMask>
+                className={`w-full px-3 py-2 border ${
+                  errors.celular ? "border-red-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500`}
+                placeholder="(00) 00000-0000"
+                required
+              />
               {errors.celular && (
                 <p className="text-red-500 text-sm mt-1">{errors.celular}</p>
               )}

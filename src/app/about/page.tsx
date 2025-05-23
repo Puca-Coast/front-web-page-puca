@@ -47,7 +47,10 @@ export default function About() {
       duration: 1500,
       easing: 'easeInOutQuad',
       complete: function(anim) {
-        document.querySelector('.preloader').style.display = 'none';
+        const preloader = document.querySelector('.preloader') as HTMLElement;
+        if (preloader) {
+          preloader.style.display = 'none';
+        }
       }
     });
 
@@ -59,7 +62,7 @@ export default function About() {
         <Header isHome={false}></Header>
         <div className="preloader fixed inset-0 bg-white flex items-center justify-center z-50">
         </div>
-        <div className="flex flex-col lg:flex-row items-center justify-center flex-1 py-20 px-8 lg:px-40">
+        <div className="flex-1 flex flex-col lg:flex-row items-center justify-center py-20 px-8 lg:px-40">
           {/* Seção da Imagem */}
           <div className="image-section lg:w-1/2 w-full flex justify-center lg:justify-end mb-10 lg:mb-0">
             <Image 

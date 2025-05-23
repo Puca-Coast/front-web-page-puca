@@ -47,7 +47,7 @@ const Home: FC<HomeProps> = ({ showIntro = true }) => {
           transition={{ duration: 1, ease: "easeInOut" }}
           className="w-full h-screen"
         >
-          <MainContent isHome={showIntro} />
+          <MainContent isHome={!introCompleted} />
         </motion.div>
       )}
       

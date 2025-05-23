@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${jura.variable}`}>
+      <body className={`${jura.variable} flex flex-col min-h-screen`}>
         <AuthProvider>
           <CartProvider>
             {children}

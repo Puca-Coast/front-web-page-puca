@@ -177,4 +177,30 @@ declare module 'react-intersection-observer' {
     inView: boolean;
     entry?: IntersectionObserverEntry;
   };
+}
+
+declare module '@react-input/mask' {
+  import { ComponentType, InputHTMLAttributes, ReactElement } from 'react';
+
+  interface InputMaskProps extends InputHTMLAttributes<HTMLInputElement> {
+    mask: string;
+    replacement?: { [key: string]: RegExp } | string;
+    showMask?: boolean;
+    separate?: boolean;
+    component?: ComponentType<any>;
+    track?: (value: string) => string;
+    modify?: (props: any) => any;
+  }
+
+  interface UseMaskOptions {
+    mask: string;
+    replacement?: { [key: string]: RegExp } | string;
+    showMask?: boolean;
+    separate?: boolean;
+    track?: (value: string) => string;
+    modify?: (props: any) => any;
+  }
+
+  export const InputMask: React.FC<InputMaskProps>;
+  export function useMask(options: UseMaskOptions): React.RefObject<HTMLInputElement>;
 } 

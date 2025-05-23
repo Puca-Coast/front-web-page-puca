@@ -5,7 +5,8 @@ import { jwtDecode } from 'jwt-decode';
 // Rotas que requerem autenticação
 const protectedRoutes = [
   '/profile',
-  '/admin'
+  '/admin',
+  '/checkout',
 ];
 
 // Rotas que requerem privilégios de administrador

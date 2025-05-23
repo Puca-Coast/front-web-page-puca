@@ -1,3 +1,157 @@
+/* Estilos para o carrinho e checkout */
+
+/* Resumo do pedido */
+.order-summary {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Estilos para itens do carrinho */
+.cart-item {
+  display: flex;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cart-item-image {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  flex-shrink: 0;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.cart-item-details {
+  margin-left: 0.75rem;
+  flex: 1;
+}
+
+.cart-item-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cart-item-meta {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* Botões de quantidade */
+.quantity-selector {
+  display: flex;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  width: 6rem;
+}
+
+.quantity-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background-color: #f3f4f6;
+}
+
+.quantity-button:hover {
+  background-color: #e5e7eb;
+}
+
+.quantity-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+}
+
+/* Estilos para checkout */
+.checkout-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9fafb;
+}
+
+.checkout-main {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem 1rem;
+}
+
+.checkout-heading {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .checkout-heading {
+    text-align: left;
+  }
+}
+
+/* Estilos para etapas do checkout */
+.checkout-progress {
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.progress-bar {
+  height: 0.25rem;
+  width: 100%;
+  background-color: #e5e7eb;
+  border-radius: 9999px;
+  margin-top: 0.5rem;
+}
+
+.progress-indicator {
+  height: 0.25rem;
+  background-color: #000000;
+  border-radius: 9999px;
+  transition: width 0.3s ease-in-out;
+}
+
+.step-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step-bubble {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-label {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
 
 
 

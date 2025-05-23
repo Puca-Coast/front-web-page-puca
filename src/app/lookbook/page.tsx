@@ -108,7 +108,7 @@ export default function LookbookPage() {
     <div className="min-h-screen flex flex-col">
       <Header isHome={false} />
 
-      <main className="flex-1 w-full mx-auto px-4 pt-20">
+      <main className="flex-1 w-full mx-auto px-4 pt-20 pb-10">
         <div className="masonry-grid">
           {photos.map((photo) => (
             <PhotoCard key={photo.id} photo={photo} />

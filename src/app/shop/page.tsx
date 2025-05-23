@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import anime from "animejs/lib/anime.js";
 import Image from "next/image";
 import WavyLoader from "@/components/ui/WavyLoader";
+import { API_BASE_URL } from "@/config/environment";
 
 interface ProductItem {
   _id: string;
@@ -16,9 +17,6 @@ interface ProductItem {
   price: number;
   sizes: { size: string; stock: number }[];
 }
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
 export default function Shop() {
   const [items, setItems] = useState<ProductItem[]>([]);
@@ -126,11 +124,11 @@ export default function Shop() {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Header isHome={false} />
 
-      <div className="flex-1 pt-20 pb-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+      <main className="flex-1 pt-20 pb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-7xl mx-auto px-4">
           {items.map((item, i) => (
             <div
               key={item._id}
@@ -183,7 +181,7 @@ export default function Shop() {
             </div>
           ))}
         </div>
-      </div>
+      </main>
 
       <Footer isHome={false} />
     </div>
