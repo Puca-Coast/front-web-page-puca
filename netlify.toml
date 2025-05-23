@@ -1,8 +1,9 @@
 [build]
-  command = "yarn build"
+  command = "NODE_OPTIONS='--max_old_space_size=2048' yarn build"
   publish = ".next"
 
 [build.environment]
+  NODE_VERSION = "18.17.0"
   NEXT_PUBLIC_API_BASE_URL = "https://puca-api.vercel.app"
 
 # Configurações para suportar SSR e roteamento do Next.js

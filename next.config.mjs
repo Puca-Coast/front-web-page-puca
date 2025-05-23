@@ -29,6 +29,10 @@ const nextConfig = {
       // SOMENTE para implantação inicial, corrija os problemas antes de ir para produção
       ignoreDuringBuilds: true,
     },
+    experimental: {
+      // Reduzir o uso de CPUs para economizar memória durante o build no Netlify
+      cpus: 1,
+    },
   };
   
   export default nextConfig;
