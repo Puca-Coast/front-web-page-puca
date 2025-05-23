@@ -3,7 +3,7 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "18.17.0"
+  NODE_VERSION = "21.0.0"
   NEXT_PUBLIC_API_BASE_URL = "https://puca-api.vercel.app"
 
 # Configurações para suportar SSR e roteamento do Next.js
