@@ -1,6 +1,6 @@
 [build]
-  command = "NODE_OPTIONS='--max_old_space_size=2048' yarn build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/"
-  publish = ".next/standalone"
+  command = "NODE_OPTIONS='--max_old_space_size=2048' yarn build"
+  publish = "out"
 
 [build.environment]
   NODE_VERSION = "21.0.0"
@@ -18,6 +18,12 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "default-src 'self'; img-src 'self' data: https://res.cloudinary.com https://puca-api.vercel.app; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' https://puca-api.vercel.app;" 
+
+# Redirecionamento para SPA - Esta regra é crucial para sites Next.js
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 # Redirecionamentos para rotas de API
 [[redirects]]
