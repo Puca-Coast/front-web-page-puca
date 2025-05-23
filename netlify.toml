@@ -6,7 +6,6 @@
   NODE_VERSION = "21.0.0"
   NEXT_PUBLIC_API_BASE_URL = "https://puca-api.vercel.app"
   NETLIFY_USE_YARN = "true"
-  NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 # Configurações para suportar SSR e roteamento do Next.js
 [[plugins]]
