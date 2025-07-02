@@ -43,20 +43,26 @@
 }
 }
 
-/* Compensação para o header fixo */
-.header-offset {
-  padding-top: 70px; /* Ajuste este valor conforme a altura do seu header */
+/* CORRIGIDO: Altura consistente do header */
+.puca-header {
+  height: 80px; /* Altura fixa do header */
+}
+
+/* CORRIGIDO: Compensação padronizada para todas as páginas */
+.puca-page-content {
+  padding-top: 80px; /* Exato valor da altura do header */
+  min-height: calc(100vh - 80px);
 }
 
 /* Ensure proper layout structure */
 body {
-  padding-top: 0; /* Remover qualquer padding que possa interferir */
+  padding-top: 0;
   margin: 0;
 }
 
 /* Fix for layout in product pages - preserves the column structure */
 .product-layout-container {
-  min-height: calc(100vh - 70px); /* Ajustado para a altura do header */
+  min-height: calc(100vh - 80px);
   display: flex;
   flex-direction: column;
 }

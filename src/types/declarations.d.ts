@@ -7,6 +7,9 @@ declare module 'react' {
   export function useEffect(effect: () => (void | (() => void | undefined)), deps?: ReadonlyArray<any>): void;
   export function useRef<T>(initialValue: T): { current: T };
   export function useCallback<T extends (...args: any[]) => any>(callback: T, deps: ReadonlyArray<any>): T;
+  export function useMemo<T>(factory: () => T, deps: ReadonlyArray<any>): T;
+  export function createContext<T>(defaultValue: T): React.Context<T>;
+  export function useContext<T>(context: React.Context<T>): T;
   
   // Tipos
   export type FC<P = {}> = React.FunctionComponent<P>;
@@ -14,8 +17,41 @@ declare module 'react' {
   export type ReactNode = React.ReactNode;
   export type CSSProperties = React.CSSProperties;
   
+  export interface Context<T> {
+    Provider: React.ComponentType<{ value: T; children?: React.ReactNode }>;
+    Consumer: React.ComponentType<{ children: (value: T) => React.ReactNode }>;
+    displayName?: string;
+  }
+  
+  // Event types
+  export interface FormEvent<T = Element> extends SyntheticEvent<T> {
+    target: EventTarget & T;
+    currentTarget: EventTarget & T;
+    preventDefault(): void;
+    stopPropagation(): void;
+  }
+  
+  export interface SyntheticEvent<T = Element> {
+    bubbles: boolean;
+    cancelable: boolean;
+    currentTarget: EventTarget & T;
+    defaultPrevented: boolean;
+    eventPhase: number;
+    isTrusted: boolean;
+    nativeEvent: Event;
+    preventDefault(): void;
+    isDefaultPrevented(): boolean;
+    stopPropagation(): void;
+    isPropagationStopped(): boolean;
+    persist(): void;
+    target: EventTarget & T;
+    timeStamp: number;
+    type: string;
+  }
+  
   // Outros
   export const Fragment: React.JSXElementConstructor<{}>;
+  export const Suspense: React.ComponentType<{ children: React.ReactNode; fallback?: React.ReactNode }>;
 }
 
 // Next.js
@@ -203,4 +239,72 @@ declare module '@react-input/mask' {
 
   export const InputMask: React.FC<InputMaskProps>;
   export function useMask(options: UseMaskOptions): React.RefObject<HTMLInputElement>;
+}
+
+declare module 'react-toastify' {
+  import { FC, ReactNode } from 'react';
+  
+  export interface ToastOptions {
+    type?: 'info' | 'success' | 'warning' | 'error' | 'default';
+    position?: 'top-left' | 'top-right' | 'top-center' | 'bottom-left' | 'bottom-right' | 'bottom-center';
+    autoClose?: number | false;
+    hideProgressBar?: boolean;
+    newestOnTop?: boolean;
+    closeOnClick?: boolean;
+    rtl?: boolean;
+    pauseOnFocusLoss?: boolean;
+    draggable?: boolean;
+    pauseOnHover?: boolean;
+    theme?: 'light' | 'dark' | 'colored';
+  }
+
+  export interface ToastContentProps {
+    closeToast?: () => void;
+    toastProps?: any;
+  }
+  
+  export interface ToastContainerProps extends ToastOptions {
+    containerId?: string;
+    enableMultiContainer?: boolean;
+    className?: string;
+    style?: React.CSSProperties;
+    toastClassName?: string;
+    bodyClassName?: string;
+    progressClassName?: string;
+    progressStyle?: React.CSSProperties;
+    transition?: any;
+    closeButton?: boolean | ((props: any) => ReactNode);
+    icon?: boolean | ((props: any) => ReactNode);
+    limit?: number;
+  }
+
+  export const ToastContainer: FC<ToastContainerProps>;
+
+  export function toast(content: ReactNode | string, options?: ToastOptions): void;
+  export namespace toast {
+    function success(content: ReactNode | string, options?: ToastOptions): void;
+    function error(content: ReactNode | string, options?: ToastOptions): void;
+    function warning(content: ReactNode | string, options?: ToastOptions): void;
+    function info(content: ReactNode | string, options?: ToastOptions): void;
+    function dismiss(toastId?: string | number): void;
+  }
+}
+
+declare module 'react-toastify/dist/ReactToastify.css';
+
+// Global declarations
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      NODE_ENV: 'development' | 'production' | 'test';
+      NEXT_PUBLIC_API_BASE_URL: string;
+      [key: string]: string | undefined;
+    }
+    
+    interface Process {
+      env: ProcessEnv;
+    }
+  }
+  
+  var process: NodeJS.Process;
 } 

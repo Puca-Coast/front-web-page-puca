@@ -34,7 +34,6 @@ body {
 main {
   flex: 1 0 auto;
   padding-top: var(--header-height);
-  min-height: calc(100vh - var(--header-height));
 }
 
 /* Classes utilitárias para ajustar padding-top em elementos que não estão no main */

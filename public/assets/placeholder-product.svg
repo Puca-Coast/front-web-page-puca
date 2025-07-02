@@ -1,0 +1,44 @@
+<svg width="400" height="500" viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="500" fill="#f8f9fa"/>
+  
+  <!-- Grid Pattern -->
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e9ecef" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="500" fill="url(#grid)" opacity="0.3"/>
+  
+  <!-- PUCA Logo Watermark -->
+  <g transform="translate(200, 250)" opacity="0.1">
+    <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" 
+          font-family="Arial, sans-serif" font-size="48" font-weight="bold" 
+          fill="#6c757d" transform="rotate(-15)">
+      PUCA
+    </text>
+  </g>
+  
+  <!-- Image Icon -->
+  <g transform="translate(200, 200)">
+    <rect x="-60" y="-40" width="120" height="80" rx="8" fill="#e9ecef" stroke="#dee2e6" stroke-width="2"/>
+    <circle cx="-30" cy="-15" r="12" fill="#6c757d" opacity="0.6"/>
+    <path d="M-50 10 L-20 -20 L20 20 L50 -10 L50 20 L-50 20 Z" fill="#6c757d" opacity="0.4"/>
+  </g>
+  
+  <!-- Product Text -->
+  <text x="200" y="320" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="16" font-weight="500" fill="#6c757d">
+    Produto PUCA
+  </text>
+  
+  <!-- Streetwear Text -->
+  <text x="200" y="345" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="12" fill="#adb5bd">
+    Streetwear Collection
+  </text>
+  
+  <!-- Decorative Lines -->
+  <line x1="120" y1="380" x2="280" y2="380" stroke="#e9ecef" stroke-width="2"/>
+  <line x1="140" y1="390" x2="260" y2="390" stroke="#e9ecef" stroke-width="1"/>
+</svg> 

@@ -29,7 +29,7 @@ export default function ExchangeReturnPage() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header isHome={false} />
       
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 pt-24 pb-10">
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 pt-36 pb-10">
         <h1 className="page-title text-4xl font-bold mb-12 text-center">Política de Troca e Devolução</h1>
         
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">

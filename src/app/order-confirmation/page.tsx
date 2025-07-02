@@ -1,131 +1,328 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import { motion } from 'framer-motion';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import Image from 'next/image';
 import Link from 'next/link';
 
-const OrderConfirmationPage = () => {
+// Force dynamic rendering to avoid prerendering issues with useSearchParams
+export const dynamic = 'force-dynamic';
+
+interface OrderDetails {
+  orderNumber: string;
+  status: string;
+  total: number;
+  items: any[];
+  shippingAddress: any;
+  payment: any;
+  shipping: any;
+  createdAt: string;
+  estimatedDelivery?: string;
+}
+
+export default function OrderConfirmationPage() {
+  const [mounted, setMounted] = useState(false);
+  const [order, setOrder] = useState<OrderDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  
   const router = useRouter();
-  const [orderNumber, setOrderNumber] = useState('');
   
   useEffect(() => {
-    // Gera um número de pedido aleatório
-    const randomOrderNumber = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-    setOrderNumber(randomOrderNumber);
+    setMounted(true);
     
-    // Em um aplicativo real, você obteria os detalhes do pedido da API
+    // Get order number from URL after mounting
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const orderId = params.get('orderNumber');
+      setOrderNumber(orderId);
+    }
   }, []);
+
+  useEffect(() => {
+    if (!mounted || !orderNumber) return;
+
+    fetchOrderDetails();
+  }, [mounted, orderNumber]);
+
+  const fetchOrderDetails = async () => {
+    if (!orderNumber) {
+      setError('Número do pedido não encontrado');
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('authToken');
+      const apiUrl = typeof window !== 'undefined' ? 
+        window.location.origin.includes('localhost') ? 'http://localhost:3000' : 'https://puca-api.vercel.app' :
+        'http://localhost:3000';
+        
+      const response = await fetch(`${apiUrl}/api/orders/track/${orderNumber}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setOrder(result.data);
+      } else {
+        setError('Pedido não encontrado');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar detalhes do pedido:', error);
+      setError('Erro ao carregar detalhes do pedido');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending': return 'text-yellow-600 bg-yellow-50';
+      case 'confirmed': return 'text-green-600 bg-green-50';
+      case 'processing': return 'text-blue-600 bg-blue-50';
+      case 'shipped': return 'text-indigo-600 bg-indigo-50';
+      case 'delivered': return 'text-green-700 bg-green-100';
+      case 'cancelled': return 'text-red-600 bg-red-50';
+      default: return 'text-gray-600 bg-gray-50';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'pending': return 'Aguardando Pagamento';
+      case 'confirmed': return 'Pedido Confirmado';
+      case 'processing': return 'Preparando Envio';
+      case 'shipped': return 'Enviado';
+      case 'delivered': return 'Entregue';
+      case 'cancelled': return 'Cancelado';
+      default: return status;
+    }
+  };
+
+  if (!mounted || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+      </div>
+    );
+  }
+
+  if (error || !order) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header isHome={false} />
+        <main className="pt-32 pb-16">
+          <div className="max-w-2xl mx-auto px-4 text-center">
+            <div className="bg-white p-8 rounded-lg shadow-sm">
+              <div className="text-red-500 text-5xl mb-4">⚠</div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                {error || 'Pedido não encontrado'}
+              </h1>
+              <p className="text-gray-600 mb-6">
+                Não conseguimos encontrar os detalhes do seu pedido.
+              </p>
+              <Link
+                href="/shop"
+                className="inline-block bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition"
+              >
+                Voltar às Compras
+              </Link>
+            </div>
+          </div>
+        </main>
+        <Footer isHome={false} />
+      </div>
+    );
+  }
   
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <Header isHome={false} />
       
-      <main className="flex-grow container mx-auto px-4 py-12 md:py-16">
-        <div className="max-w-2xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-sm">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      <main className="pt-32 pb-16">
+        <div className="max-w-4xl mx-auto px-4">
+          
+          {/* Success Animation */}
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="text-center mb-8"
+          >
+            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">Pedido Confirmado!</h1>
-            <p className="text-gray-600">
-              Obrigado pela sua compra. Um e-mail de confirmação foi enviado para o seu endereço de e-mail.
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Pedido Confirmado!
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Obrigado pela sua compra. Seu pedido foi recebido e está sendo processado.
             </p>
-          </div>
+          </motion.div>
           
-          <div className="border-t border-b py-4 my-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600">Número do Pedido</span>
-              <span className="font-semibold">{`#${orderNumber}`}</span>
+          {/* Order Summary Card */}
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="bg-white rounded-lg shadow-sm p-6 mb-6"
+          >
+            <div className="border-b pb-4 mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Pedido #{order.orderNumber}
+                  </h2>
+                  <p className="text-gray-500 text-sm">
+                    Realizado em {new Date(order.createdAt).toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric'
+                    })}
+                  </p>
             </div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600">Data</span>
-              <span>{new Date().toLocaleDateString('pt-BR')}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Status</span>
-              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
-                Processando
+                <div className="mt-2 sm:mt-0">
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
+                    {getStatusText(order.status)}
               </span>
             </div>
-          </div>
-          
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-3">Informações de Entrega</h2>
-            <p className="text-gray-700 mb-1">Endereço de entrega:</p>
-            <p className="text-gray-600">
-              Rua Exemplo, 123<br />
-              Bairro, Cidade - UF<br />
-              CEP: 00000-000
-            </p>
-          </div>
-          
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-3">Método de Pagamento</h2>
-            <div className="flex items-center">
-              <div className="w-10 h-6 bg-gray-200 rounded mr-3"></div>
-              <span className="text-gray-600">Cartão de Crédito (final 1234)</span>
             </div>
           </div>
           
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Rastreamento de Pedido</h2>
-            <div className="relative">
-              <div className="absolute left-3 top-0 ml-px h-full w-0.5 bg-gray-200"></div>
-              
-              <div className="relative flex items-start mb-6">
-                <div className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center -ml-3.5 z-10">
-                  <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
+            {/* Progress Steps */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                {['pending', 'confirmed', 'processing', 'shipped', 'delivered'].map((step, index) => {
+                  const currentIndex = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'].indexOf(order.status);
+                  const isCompleted = index <= currentIndex;
+                  const isCurrent = index === currentIndex;
+                  
+                  return (
+                    <div key={step} className="flex items-center">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                        isCompleted ? 'bg-green-500 text-white' : 
+                        isCurrent ? 'bg-blue-500 text-white' : 
+                        'bg-gray-200 text-gray-500'
+                      }`}>
+                        {isCompleted && !isCurrent ? '✓' : index + 1}
                 </div>
-                <div className="ml-4">
-                  <h3 className="font-medium">Pedido Confirmado</h3>
-                  <p className="text-sm text-gray-500">{new Date().toLocaleDateString('pt-BR')}</p>
+                      {index < 4 && (
+                        <div className={`h-1 w-16 mx-2 ${
+                          index < currentIndex ? 'bg-green-500' : 'bg-gray-200'
+                        }`} />
+                      )}
+                </div>
+                  );
+                })}
+              </div>
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                <span>Pedido</span>
+                <span>Confirmado</span>
+                <span>Preparando</span>
+                <span>Enviado</span>
+                <span>Entregue</span>
                 </div>
               </div>
               
-              <div className="relative flex items-start mb-6">
-                <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center -ml-3.5 z-10">
-                  <div className="h-2 w-2 rounded-full bg-gray-400"></div>
+            {/* Order Items */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium text-gray-900">Itens do Pedido</h3>
+              {order.items?.map((item, index) => (
+                <div key={index} className="flex items-center py-4 border-b last:border-b-0">
+                  <div className="relative w-16 h-16 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                    <Image
+                      src={item.image}
+                      alt={item.name}
+                      fill
+                      className="object-cover"
+                      sizes="64px"
+                    />
+                  </div>
+                  <div className="ml-4 flex-1">
+                    <h4 className="text-sm font-medium text-gray-900">{item.name}</h4>
+                    <p className="text-sm text-gray-500">Tamanho: {item.size}</p>
+                    <p className="text-sm text-gray-500">Quantidade: {item.quantity}</p>
+                  </div>
+                  <div className="text-sm font-medium text-gray-900">
+                    R$ {(item.price * item.quantity).toFixed(2)}
                 </div>
-                <div className="ml-4">
-                  <h3 className="font-medium text-gray-500">Em Processamento</h3>
-                  <p className="text-sm text-gray-500">Em breve</p>
                 </div>
-              </div>
-              
-              <div className="relative flex items-start">
-                <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center -ml-3.5 z-10">
-                  <div className="h-2 w-2 rounded-full bg-gray-400"></div>
-                </div>
-                <div className="ml-4">
-                  <h3 className="font-medium text-gray-500">Enviado</h3>
-                  <p className="text-sm text-gray-500">Pendente</p>
-                </div>
+              ))}
+            </div>
+
+            {/* Order Total */}
+            <div className="mt-6 pt-4 border-t">
+              <div className="flex justify-between text-lg font-semibold">
+                <span>Total</span>
+                <span>R$ {order.total?.toFixed(2) || '0.00'}</span>
               </div>
             </div>
+          </motion.div>
+
+          {/* Tracking Information */}
+          {order.shipping?.trackingCode && (
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="bg-white rounded-lg shadow-sm p-6 mb-6"
+            >
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Rastreamento</h3>
+              <div className="bg-gray-50 p-4 rounded-md">
+                <p className="text-sm text-gray-600 mb-2">Código de Rastreamento:</p>
+                <p className="text-lg font-mono text-gray-900 mb-3">{order.shipping.trackingCode}</p>
+                {order.shipping.trackingUrl && (
+                  <a
+                    href={order.shipping.trackingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  >
+                    Rastrear no site dos Correios
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                )}
           </div>
-          
-          <div className="flex flex-col md:flex-row md:space-x-4">
-            <Link href="/shop" className="bg-black text-white py-3 px-4 rounded-md text-center hover:bg-gray-800 transition-colors mb-4 md:mb-0 md:flex-1">
+            </motion.div>
+          )}
+
+          {/* Actions */}
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <Link
+              href="/shop"
+              className="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 transition font-medium"
+            >
               Continuar Comprando
             </Link>
-            <button className="border border-gray-300 text-gray-700 py-3 px-4 rounded-md text-center hover:bg-gray-50 transition-colors md:flex-1">
-              Ver Detalhes do Pedido
-            </button>
-          </div>
+            <Link
+              href="/auth/profile"
+              className="inline-flex items-center justify-center px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800 transition font-medium"
+            >
+              Ver Meus Pedidos
+            </Link>
+          </motion.div>
+
         </div>
       </main>
       
       <Footer isHome={false} />
     </div>
   );
-};
-
-export default OrderConfirmationPage; 
+} 

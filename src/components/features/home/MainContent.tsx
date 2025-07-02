@@ -11,7 +11,7 @@ const MainContent: FC<MainContentProps> = ({ isHome }) => {
   const footerHeight = 64; // Altura real do seu footer em pixels
 
   // Calcula a altura disponível para o carousel
-  const carouselHeight = `calc(100vh - ${headerHeight}px - ${footerHeight}px)`;
+  const carouselHeight = `calc(100vh - ${headerHeight}px)`;
   console.log(isHome);
   return (
     <div
@@ -22,7 +22,7 @@ const MainContent: FC<MainContentProps> = ({ isHome }) => {
       <div
         className="flex-grow"
         style={{
-          marginTop: `${headerHeight}em`,
+          marginTop: `${headerHeight}px`,
           height: carouselHeight,
         }}
       >

@@ -13,6 +13,8 @@ interface LookbookPhoto {
   height: number;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export default function LookbookPage() {
   const [photos, setPhotos] = useState<LookbookPhoto[]>([]);
   const [page, setPage] = useState(1);
@@ -28,7 +30,7 @@ export default function LookbookPage() {
 
     try {
       // Chame sua API (AJUSTE O ENDPOINT CONFORME NECESSÁRIO)
-      const res = await fetch(`http://localhost:3000/api/lookbook/photos?page=${page}&limit=10`);
+      const res = await fetch(`${API_BASE_URL}/api/lookbook/photos?page=${page}&limit=10`);
       const data = await res.json();
 
       if (data.success) {
@@ -115,10 +117,9 @@ export default function LookbookPage() {
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-cover"
                   priority={index < 3} // Priorizar apenas as primeiras 3 imagens
-                  onLoad={(event) => {
+                  onLoadingComplete={(result) => {
                     // Adicione comportamentos adicionais quando a imagem carregar, se necessário
-                    const target = event.target as HTMLImageElement;
-                    if (target.complete) {
+                    if (result.naturalWidth > 0) {
                       // Imagem carregada com sucesso
                     }
                   }}

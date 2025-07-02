@@ -8,6 +8,8 @@ interface IntroProps {
   onComplete: () => void;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export default function Intro({ onComplete }: IntroProps) {
   const [introState, setIntroState] = useState<'active' | 'fading' | 'complete'>('active');
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
@@ -19,7 +21,7 @@ export default function Intro({ onComplete }: IntroProps) {
       if (!localStorage.getItem("carouselPhotos")) {
         try {
           const response = await fetch(
-            "http://localhost:3000/api/lookbook/photos?launch=primavera2024&limit=10"
+            `${API_BASE_URL}/api/lookbook/photos?launch=primavera2024&limit=10`
           );
           const data = await response.json();
           
@@ -31,7 +33,7 @@ export default function Intro({ onComplete }: IntroProps) {
               try {
                 const imagePromises = data.data.slice(0, 3).map(photo => {
                   return new Promise((resolve, reject) => {
-                    const img = new Image();
+                    const img = new window.Image();
                     img.src = photo.url;
                     img.onload = () => resolve(img);
                     img.onerror = reject;

@@ -1,40 +1,16 @@
 [build]
-  command = "NODE_OPTIONS='--max_old_space_size=2048' yarn build"
-  publish = "out"
+  command = "yarn build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/next-runtime"
 
 [build.environment]
   NODE_VERSION = "21.0.0"
   NEXT_PUBLIC_API_BASE_URL = "https://puca-api.vercel.app"
   NETLIFY_USE_YARN = "true"
-  NETLIFY_NEXT_PLUGIN_SKIP = "true"
-  NEXT_STANDALONE = "true"
 
-# Configurações para segurança
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data: https://res.cloudinary.com https://puca-api.vercel.app; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' https://puca-api.vercel.app;" 
-
-# Redirecionamentos específicos para rotas dinâmicas de produtos
-[[redirects]]
-  from = "/product/*"
-  to = "/product/[id].html"
-  status = 200
-  force = true
-
-# Redirecionamentos para rotas de API
 [[redirects]]
   from = "/api/*"
-  to = "https://puca-api.vercel.app/api/:splat"
+  to   = "https://puca-api.vercel.app/api/:splat"
   status = 200
-  force = true
-
-# Redirecionamento fallback para SPA
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200 

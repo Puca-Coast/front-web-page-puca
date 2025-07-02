@@ -13,6 +13,8 @@ interface LookbookSectionProps {
     orientation: "horizontal" | "vertical";
     width: number;
     height: number;
+    alt: string;
+    blurDataURL: string;
   }[];
 }
 
@@ -42,13 +44,13 @@ const LookbookSection: React.FC<LookbookSectionProps> = ({ pattern, images }) =>
         >
           <Image
             src={images[0].src}
-            alt="Lookbook Image"
+            alt={images[0].alt}
             fill
+            style={{ objectFit: "contain" }}
             className="object-cover rounded-md"
             loading="lazy"
             placeholder="blur"
-            blurDataURL="/assets/placeholder.png"
-            style={{ objectFit: "contain" }}
+            blurDataURL={images[0].blurDataURL}
           />
         </div>
       )}
@@ -68,12 +70,13 @@ const LookbookSection: React.FC<LookbookSectionProps> = ({ pattern, images }) =>
             >
               <Image
                 src={image.src}
-                alt={`Lookbook Image ${image.id}`}
+                alt={image.alt}
                 fill
-                className="object-cover rounded-md"
+                style={{ objectFit: "cover" }}
+                className="rounded-md"
                 loading="lazy"
                 placeholder="blur"
-                blurDataURL="/assets/placeholder.png"
+                blurDataURL={image.blurDataURL}
               />
             </motion.div>
           ))}
@@ -92,12 +95,13 @@ const LookbookSection: React.FC<LookbookSectionProps> = ({ pattern, images }) =>
           >
             <Image
               src={images[0].src}
-              alt={`Lookbook Image ${images[0].id}`}
+              alt={images[0].alt}
               fill
-              className="object-cover rounded-md"
+              style={{ objectFit: "cover" }}
+              className="rounded-md"
               loading="lazy"
               placeholder="blur"
-              blurDataURL="/assets/placeholder.png"
+              blurDataURL={images[0].blurDataURL}
             />
           </motion.div>
 
@@ -111,12 +115,13 @@ const LookbookSection: React.FC<LookbookSectionProps> = ({ pattern, images }) =>
             >
               <Image
                 src={image.src}
-                alt={`Lookbook Image ${image.id}`}
+                alt={image.alt}
                 fill
-                className="object-cover rounded-md"
+                style={{ objectFit: "cover" }}
+                className="rounded-md"
                 loading="lazy"
                 placeholder="blur"
-                blurDataURL="/assets/placeholder.png"
+                blurDataURL={image.blurDataURL}
               />
             </motion.div>
           ))}
@@ -190,15 +195,14 @@ const LookbookSection: React.FC<LookbookSectionProps> = ({ pattern, images }) =>
             >
               <Image
                 src={image.src}
-                alt={`Lookbook Image ${image.id}`}
+                alt={image.alt}
                 width={image.width}
                 height={image.height}
-                layout="responsive"
-                objectFit="cover"
+                style={{ objectFit: "cover" }}
                 className="rounded-md"
                 loading="lazy"
                 placeholder="blur"
-                blurDataURL="/assets/placeholder.png"
+                blurDataURL={image.blurDataURL}
               />
             </motion.div>
           ))}

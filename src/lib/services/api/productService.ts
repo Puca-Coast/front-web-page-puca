@@ -12,8 +12,8 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  imageUrl: string;
-  hoverImageUrl: string;
+  imageUrl: string; // ID/URL principal
+  hoverImageUrl: string; // ID/URL hover
   stockBySize: { size: string; stock: number }[];
 }
 
@@ -88,10 +88,42 @@ export const productService = {
   },
 
   /**
-   * URL para imagem de produto
+   * URL para imagem de produto com fallbacks e debug
    */
   getProductImageUrl(imageId: string): string {
-    return `${process.env.NEXT_PUBLIC_API_BASE_URL || ''}/api/products/image/${imageId}`;
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+
+    // Se a string já for uma URL completa (Cloudinary, S3 etc.) basta retornar
+    if (imageId?.startsWith('http')) {
+      return imageId;
+    }
+
+    // Validação do imageId
+    if (!imageId || imageId === 'undefined' || imageId === 'null') {
+      return '/assets/placeholder-product.svg';
+    }
+
+    return `${baseUrl}/api/products/image/${imageId}`;
+  },
+
+  /**
+   * Verificar se imagem existe (para fallback)
+   */
+  async checkImageExists(imageUrl: string): Promise<boolean> {
+    try {
+      const response = await fetch(imageUrl, { method: 'HEAD' });
+      return response.ok;
+    } catch (error) {
+      console.warn('Erro ao verificar imagem:', error);
+      return false;
+    }
+  },
+
+  /**
+   * Obter URL de fallback para imagem
+   */
+  getFallbackImageUrl(): string {
+    return '/assets/placeholder-product.svg';
   },
 
   /**

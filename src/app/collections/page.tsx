@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Image from "next/image";
-import anime from "animejs/lib/anime.es.js";
+import anime from "animejs/lib/anime.js";
 
 export default function Collections() {
 
@@ -47,7 +47,10 @@ export default function Collections() {
       duration: 1500,
       easing: 'easeInOutQuad',
       complete: function(anim) {
-        document.querySelector('.preloader').style.display = 'none';
+        const preloader = document.querySelector('.preloader') as HTMLElement;
+        if (preloader) {
+          preloader.style.display = 'none';
+        }
       }
     });
 

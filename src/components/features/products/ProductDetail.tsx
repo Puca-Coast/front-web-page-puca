@@ -9,6 +9,7 @@ import { API_BASE_URL } from "@/config/environment";
 import { useCart } from "@/contexts/CartContext";
 import { motion } from "framer-motion";
 import "@/styles/productStyles.css";
+import { productService } from "@/lib/services/api/productService";
 
 interface ProductDetailProps {
   productId: string;
@@ -19,15 +20,9 @@ interface ProductType {
   name: string;
   description?: string;
   price: number;
-  image: {
-    url: string;
-    publicId: string;
-  };
-  hoverImage: {
-    url: string;
-    publicId: string;
-  };
-  stockBySize: { size: string; stock: number; _id: string }[];
+  imageUrl: string;
+  hoverImageUrl: string;
+  stockBySize: { size: string; stock: number; _id?: string }[];
   createdAt: string;
   updatedAt: string;
 }
@@ -39,7 +34,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [currentImage, setCurrentImage] = useState<string>("");
-  const { addToCart } = useCart();
+  const { addToCart } = useCart() as any;
   const [isHovered, setIsHovered] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -74,8 +69,13 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         const data = await res.json();
         
         if (data.success && data.data) {
-          setProduct(data.data);
-          setCurrentImage(data.data.image.url);
+          // Converte IDs de imagem em URLs completas
+          const prod: ProductType = data.data;
+          const mainUrl = productService.getProductImageUrl(prod.imageUrl);
+          const hoverUrl = productService.getProductImageUrl(prod.hoverImageUrl);
+
+          setProduct({ ...prod, imageUrl: mainUrl, hoverImageUrl: hoverUrl });
+          setCurrentImage(mainUrl);
         } else {
           setError(data.message || "Erro ao carregar produto");
           toast.error(data.message || "Erro ao carregar produto");
@@ -112,7 +112,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
       id: product._id,
       name: product.name,
       price: product.price,
-      imageUrl: product.image.url,
+      imageUrl: product.imageUrl,
       size: selectedSize,
     });
     
@@ -136,7 +136,7 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
   
   const handleImageHover = () => {
     if (!product) return;
-    setCurrentImage(isHovered ? product.image.url : product.hoverImage.url);
+    setCurrentImage(isHovered ? product.imageUrl : product.hoverImageUrl);
     setIsHovered(!isHovered);
   };
 
@@ -189,10 +189,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
             <motion.div 
               className={`product-thumbnail w-24 h-24 relative cursor-pointer rounded-md overflow-hidden border-2 ${activeImageIndex === 0 ? 'border-black' : 'border-gray-200'}`}
               whileHover={{ scale: 1.05 }}
-              onClick={() => handleThumbnailClick(product.image.url, 0)}
+              onClick={() => handleThumbnailClick(product.imageUrl, 0)}
             >
               <Image 
-                src={product.image.url} 
+                src={product.imageUrl} 
                 alt={`${product.name} - Imagem principal`} 
                 fill 
                 className="object-cover" 
@@ -201,10 +201,10 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
             <motion.div 
               className={`product-thumbnail w-24 h-24 relative cursor-pointer rounded-md overflow-hidden border-2 ${activeImageIndex === 1 ? 'border-black' : 'border-gray-200'}`}
               whileHover={{ scale: 1.05 }}
-              onClick={() => handleThumbnailClick(product.hoverImage.url, 1)}
+              onClick={() => handleThumbnailClick(product.hoverImageUrl, 1)}
             >
               <Image 
-                src={product.hoverImage.url} 
+                src={product.hoverImageUrl} 
                 alt={`${product.name} - Imagem secundária`} 
                 fill 
                 className="object-cover" 

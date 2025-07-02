@@ -1,40 +1,55 @@
 /** @type {import('next').NextConfig} */
-/** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'export',
-    images: {
-      remotePatterns: [
-        {
-          protocol: 'https',
-          hostname: 'res.cloudinary.com',
-          pathname: '/dgsigv8cf/**', // Substitua pelo seu nome de pasta no Cloudinary
-        },
-        {
-          protocol: 'https',
-          hostname: 'puca-api.vercel.app',
-          pathname: '/**',
-        },
-      ],
-      domains: ['localhost', 'puca-api.vercel.app'],
-      unoptimized: true,
-    },
-    typescript: {
-      // !! WARN !!
-      // Isso ignora erros de tipo durante a build
-      // SOMENTE para implantação inicial, remova para build de produção final
-      ignoreBuildErrors: true,
-    },
-    eslint: {
-      // !! WARN !!
-      // Isso ignora erros de ESLint durante a build
-      // SOMENTE para implantação inicial, corrija os problemas antes de ir para produção
-      ignoreDuringBuilds: true,
-    },
-    experimental: {
-      // Reduzir o uso de CPUs para economizar memória durante o build no Netlify
-      cpus: 1,
-    },
-  };
+  experimental: {
+    // Configurações experimentais atualizadas para Next.js 15
+    optimizeCss: true,
+    cpus: 1,
+  },
   
-  export default nextConfig;
+  // Configurações de imagem otimizadas
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3000',
+      },
+    ],
+    formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
   
+  // Headers de segurança e performance
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+        ],
+      },
+    ];
+  },
+};
+
+export default nextConfig;
