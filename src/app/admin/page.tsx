@@ -9,6 +9,8 @@ import Footer from '@/components/layout/Footer';
 import Image from 'next/image';
 import { toast } from 'react-toastify';
 import { productService } from '@/lib/services/api/productService';
+import AdminProductModal from '@/components/features/admin/AdminProductModal';
+import { lookbookService } from '@/lib/services/api/lookbookService';
 
 interface OrderStats {
   totalOrders: number;
@@ -66,6 +68,8 @@ export default function AdminPanel() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [lookbookPhotos, setLookbookPhotos] = useState<any[]>([]);
+  const [productModalOpen, setProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<ProductData | null>(null);
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== 'admin')) {
@@ -135,8 +139,8 @@ export default function AdminPanel() {
         // Converte IDs de imagem em URLs completas para exibição
         const mappedProducts = productsResult.data.map((p: any) => ({
           ...p,
-          imageUrl: productService.getProductImageUrl(p.imageUrl),
-          hoverImageUrl: productService.getProductImageUrl(p.hoverImageUrl)
+          imageUrl: p.imageUrl ? productService.getProductImageUrl(p.imageUrl) : p.image?.url,
+          hoverImageUrl: p.hoverImageUrl ? productService.getProductImageUrl(p.hoverImageUrl) : p.hoverImage?.url || (p.image?.url ?? '')
         }));
 
         setProducts(mappedProducts);
@@ -339,12 +343,21 @@ export default function AdminPanel() {
   };
 
   const handleEditProduct = (id: string) => {
-    toast.info('Funcionalidade de edição em desenvolvimento');
-    // Futuro: router.push(`/admin/products/${id}/edit`);
+    const prod = products.find(p => p._id === id) || null;
+    setEditingProduct(prod);
+    setProductModalOpen(true);
+  };
+
+  const handleNewProduct = () => {
+    setEditingProduct(null);
+    setProductModalOpen(true);
   };
 
   const handleDeleteProduct = async (id: string) => {
     if (!confirm('Tem certeza que deseja excluir este produto? Esta ação é irreversível.')) return;
+
+    // Remoção otimista na interface
+    setProducts((prev) => prev.filter((p) => p._id !== id));
 
     try {
       await productService.deleteProduct(id);
@@ -353,6 +366,25 @@ export default function AdminPanel() {
     } catch (error: any) {
       console.error('Erro ao excluir produto:', error);
       toast.error(error.message || 'Erro ao excluir produto');
+      // Reverter em caso de erro
+      fetchAdminData();
+    }
+  };
+
+  const handleProductModalSaved = () => {
+    setProductModalOpen(false);
+    fetchAdminData();
+  };
+
+  const handleDeleteLookbookPhoto = async (photoId: string) => {
+    if (!confirm('Remover esta foto do lookbook?')) return;
+    try {
+      await lookbookService.deletePhoto(photoId);
+      setLookbookPhotos(prev => prev.filter(p => p._id !== photoId));
+      toast.success('Foto removida');
+    } catch (error: any) {
+      console.error('Erro ao remover foto:', error);
+      toast.error(error.message || 'Erro ao remover foto');
     }
   };
 
@@ -639,7 +671,7 @@ export default function AdminPanel() {
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.6 1.963-1.765 3.73-3.342 5.008M15 12h.01" />
                                 </svg>
                               </button>
-                              <button className="text-white mx-1 hover:text-gray-300" onClick={() => toast.info('Funcionalidade remover em desenvolvimento')}>
+                              <button className="text-white mx-1 hover:text-gray-300" onClick={() => handleDeleteLookbookPhoto(photo._id)}>
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -671,7 +703,7 @@ export default function AdminPanel() {
                             </svg>
                             Filtros
                           </button>
-                          <button className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition">
+                          <button onClick={handleNewProduct} className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition">
                             <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                             </svg>
@@ -717,10 +749,13 @@ export default function AdminPanel() {
                                   <div className="font-medium text-gray-900">R$ {product.price.toFixed(2)}</div>
                                 </td>
                                 <td className="py-3 px-2">
-                                  <div className={`font-medium ${product.stockBySize.some(size => size.stock > 0) ? 'text-gray-900' : 'text-red-600'}`}>
+                                  <div className="flex flex-wrap gap-1">
                                     {product.stockBySize.map(size => (
-                                      <span key={size.size} className="text-sm text-gray-500">
-                                        {size.size}: {size.stock} unidades
+                                      <span
+                                        key={size.size}
+                                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${size.stock > 0 ? 'bg-gray-100 text-gray-800' : 'bg-red-100 text-red-600'}`}
+                                      >
+                                        {size.size}: {size.stock}
                                       </span>
                                     ))}
                                   </div>
@@ -1028,6 +1063,14 @@ export default function AdminPanel() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Product Modal */}
+      <AdminProductModal
+        open={productModalOpen}
+        product={editingProduct}
+        onClose={() => setProductModalOpen(false)}
+        onSaved={handleProductModalSaved}
+      />
 
       <Footer isHome={false} />
     </div>

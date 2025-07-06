@@ -51,7 +51,7 @@
 /* CORRIGIDO: Compensação padronizada para todas as páginas */
 .puca-page-content {
   padding-top: 80px; /* Exato valor da altura do header */
-  min-height: calc(100vh - 80px);
+  height: 100vh;
 }
 
 /* Ensure proper layout structure */

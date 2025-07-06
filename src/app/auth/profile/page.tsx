@@ -162,7 +162,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <Header isHome={false} />
       
-      <main className="puca-page-content pb-16">
+      <main className="puca-page-content">
         <div className="max-w-6xl mx-auto px-4">
           
           {/* Welcome Header */}

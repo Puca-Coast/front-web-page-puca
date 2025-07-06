@@ -27,14 +27,27 @@ export default function Shop() {
   const controllerRef = useRef<AbortController | null>(null);
 
   // Função para mapear produtos da API
-  const mapProduct = useCallback((product: Product): ProductItem => ({
-    _id: product._id,
-    imageUrl: productService.getProductImageUrl((product as any).imageUrl),
-    hoverImageUrl: productService.getProductImageUrl((product as any).hoverImageUrl),
-    name: product.name,
-    price: product.price,
-    sizes: product.stockBySize
-  }), []);
+  const mapProduct = useCallback((product: Product): ProductItem => {
+    const mainId = (product as any).imageUrl;
+    const hoverId = (product as any).hoverImageUrl;
+
+    const mainUrl = mainId
+      ? productService.getProductImageUrl(mainId)
+      : (product as any).image?.url || '/assets/placeholder-product.svg';
+
+    const hoverUrl = hoverId
+      ? productService.getProductImageUrl(hoverId)
+      : (product as any).hoverImage?.url || mainUrl;
+
+    return {
+      _id: product._id,
+      imageUrl: mainUrl,
+      hoverImageUrl: hoverUrl,
+      name: product.name,
+      price: product.price,
+      sizes: product.stockBySize
+    };
+  }, []);
 
   // Buscar produtos
   const fetchProducts = useCallback(async () => {
@@ -110,7 +123,7 @@ export default function Shop() {
         <div className="absolute inset-0" style={{
           backgroundImage: `
             linear-gradient(rgba(0,0,0,0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,0,0,0.3) 1px, transparent 1px)
+            linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)
           `,
           backgroundSize: '40px 40px'
         }} />
@@ -119,10 +132,10 @@ export default function Shop() {
       <Header isHome={false} />
 
       {/* CORRIGIDO: Scroll permitido */}
-      <main className="puca-page-content pb-16 relative z-10">
+      <main className="puca-page-content relative z-10">
         
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mx-auto">
             {Array.from({ length: 9 }).map((_, idx) => (
               <div
                 key={`skeleton-${idx}`}
@@ -147,11 +160,14 @@ export default function Shop() {
         )}
 
         {!loading && !error && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mx-auto">
             {items.map((item, i) => (
               <div
                 key={item._id}
                 className="group relative cursor-pointer transition-all duration-300"
+                style={{
+                  width: '35.2em'
+                }}
                 onMouseEnter={() => setHoverIdx(i)}
                 onMouseLeave={() => setHoverIdx(null)}
                 onClick={() => handleProductClick(item._id)}
@@ -182,27 +198,23 @@ export default function Shop() {
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className={`
-                        object-contain absolute top-0 left-0 transition-all duration-500
+                        object-cover absolute top-0 left-0 transition-all duration-500
                         ${hoverIdx === i ? 'opacity-100' : 'opacity-0'}
                       `}
                     />
+                  </div>
 
-                    {/* Overlay escuro no hover - simples e elegante */}
-                    <div className={`
-                      absolute inset-0 bg-black/100 transition-opacity duration-500
-                      ${hoverIdx === i ? 'opacity-0' : 'opacity-0'}
-                    `} />
-
-                    {/* Informações do produto - overlay minimalista */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/5 backdrop-blur-sm p-4">
-                      <h3 className="font-medium text-white text-sm mb-1 truncate">
+                  {/* Informações do produto dentro do card */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-transparent backdrop-blur-sm">
+                    <h3 className="text-sm font-medium text-gray-900 uppercase tracking-tight line-clamp-1">
                       {item.name}
                     </h3>
-                    
-                      <p className="text-lg font-semibold text-white">
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {item.sizes.map(s => s.size).join(' / ')}
+                    </p>
+                    <p className="text-sm font-semibold text-gray-900 mt-1">
                       R$ {item.price.toFixed(2)}
                     </p>
-                    </div>
                   </div>
                 </div>
               </div>

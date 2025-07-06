@@ -538,10 +538,10 @@ const CheckoutPage: React.FC = () => {
                           <h3 className="font-medium">Cartão de crédito</h3>
                           <p className="text-sm text-gray-500">Visa, Mastercard, Elo</p>
                         </div>
-                        <div className="flex space-x-1">
-                          <div className="w-8 h-5 bg-blue-500 rounded flex items-center justify-center text-xs text-white font-bold">VISA</div>
-                          <div className="w-8 h-5 bg-red-500 rounded flex items-center justify-center text-xs text-white font-bold">MC</div>
-                          <div className="w-8 h-5 bg-yellow-500 rounded flex items-center justify-center text-xs text-white font-bold">ELO</div>
+                        <div className="flex space-x-2 items-center">
+                          <Image src="/assets/payments/visa.svg" alt="Visa" width={32} height={20} />
+                          <Image src="/assets/payments/mastercard.svg" alt="Mastercard" width={32} height={20} />
+                          <Image src="/assets/payments/elo.svg" alt="Elo" width={32} height={20} />
                         </div>
                       </div>
                       
@@ -556,7 +556,7 @@ const CheckoutPage: React.FC = () => {
                           <h3 className="font-medium">PIX</h3>
                           <p className="text-sm text-gray-500">Pagamento instantâneo</p>
                         </div>
-                        <div className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center text-xs">PIX</div>
+                        <Image src="/assets/payments/pix.svg" alt="Pix" width={32} height={20} />
                       </div>
                       
                       <div 
@@ -570,7 +570,7 @@ const CheckoutPage: React.FC = () => {
                           <h3 className="font-medium">Boleto bancário</h3>
                           <p className="text-sm text-gray-500">Prazo de 1-3 dias úteis</p>
                         </div>
-                        <div className="w-10 h-5 bg-orange-500 rounded flex items-center justify-center text-xs text-white font-bold">BOLETO</div>
+                        <Image src="/assets/payments/boleto.svg" alt="Boleto" width={32} height={20} />
                       </div>
                     </div>
                     

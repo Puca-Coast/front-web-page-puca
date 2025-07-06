@@ -29,7 +29,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
     if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
+      const parsed: any[] = JSON.parse(storedCart);
+      // Migração de formato: se tiver image.url, converte para imageUrl
+      const normalized = parsed.map((item) => {
+        if (!item.imageUrl && item.image?.url) {
+          return { ...item, imageUrl: item.image.url };
+        }
+        return item;
+      });
+      setCartItems(normalized);
     }
   }, []);
 

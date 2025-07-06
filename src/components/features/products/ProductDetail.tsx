@@ -71,8 +71,12 @@ export default function ProductDetail({ productId }: ProductDetailProps) {
         if (data.success && data.data) {
           // Converte IDs de imagem em URLs completas
           const prod: ProductType = data.data;
-          const mainUrl = productService.getProductImageUrl(prod.imageUrl);
-          const hoverUrl = productService.getProductImageUrl(prod.hoverImageUrl);
+          const mainUrl = prod.imageUrl
+            ? productService.getProductImageUrl(prod.imageUrl)
+            : (prod as any).image?.url;
+          const hoverUrl = prod.hoverImageUrl
+            ? productService.getProductImageUrl(prod.hoverImageUrl)
+            : (prod as any).hoverImage?.url || mainUrl;
 
           setProduct({ ...prod, imageUrl: mainUrl, hoverImageUrl: hoverUrl });
           setCurrentImage(mainUrl);

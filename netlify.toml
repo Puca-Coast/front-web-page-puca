@@ -2,9 +2,6 @@
   command = "yarn build"
   publish = ".next"
 
-[[plugins]]
-  package = "@netlify/next-runtime"
-
 [build.environment]
   NODE_VERSION = "21.0.0"
   NEXT_PUBLIC_API_BASE_URL = "https://puca-api.vercel.app"

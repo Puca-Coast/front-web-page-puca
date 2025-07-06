@@ -14,6 +14,7 @@ export interface Product {
   price: number;
   imageUrl: string; // ID/URL principal
   hoverImageUrl: string; // ID/URL hover
+  galleryImageUrls?: string[]; // Imagens adicionais
   stockBySize: { size: string; stock: number }[];
 }
 
