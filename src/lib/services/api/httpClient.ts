@@ -14,140 +14,249 @@ import { getCookie } from '../../utils/cookies';
 
 // Configuração da API
 const getApiBaseUrl = (): string => {
-  // Em ambiente de desenvolvimento local
-  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-    return 'http://localhost:3000';
-  }
-  
-  // Em produção
-  return 'https://puca-api.vercel.app';
+  // Usar a variável de ambiente ou fallback para a URL da API do Vercel
+  return typeof window !== 'undefined' && (window as any).process?.env?.NEXT_PUBLIC_API_BASE_URL || 
+         'https://puca-api.vercel.app';
 };
 
 const API_BASE_URL = getApiBaseUrl();
 
-interface RequestOptions extends RequestInit {
-  requiresAuth?: boolean;
-}
+// Configuração para retry automático
+const RETRY_ATTEMPTS = 3;
+const RETRY_DELAY = 1000; // 1 segundo
+
+// Função para delay entre tentativas
+const delay = (ms: number): Promise<void> => 
+  new Promise(resolve => setTimeout(resolve, ms));
+
+// Função para fazer retry de requisições
+const withRetry = async <T>(
+  fn: () => Promise<T>, 
+  attempts: number = RETRY_ATTEMPTS,
+  delayMs: number = RETRY_DELAY
+): Promise<T> => {
+  try {
+    return await fn();
+  } catch (error) {
+    if (attempts > 1) {
+      console.log(`Tentativa falhada, tentando novamente em ${delayMs}ms...`);
+      await delay(delayMs);
+      return withRetry(fn, attempts - 1, delayMs * 1.5); // Backoff exponencial
+    }
+    throw error;
+  }
+};
+
+// Configuração padrão para requisições
+const defaultOptions: RequestInit = {
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+  mode: 'cors',
+  credentials: 'include',
+};
 
 /**
- * Cliente HTTP com interceptors para tokens e erros
+ * Interceptor para adicionar token de autenticação
+ */
+const addAuthHeader = (options: RequestInit): RequestInit => {
+  const token = getCookie('auth_token');
+  
+  if (token) {
+    return {
+      ...options,
+      headers: {
+        ...options.headers,
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  }
+  
+  return options;
+};
+
+/**
+ * Interceptor para tratar erros HTTP
+ */
+const handleHttpError = async (response: Response): Promise<Response> => {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    
+    // Tratamento específico para diferentes códigos de erro
+    switch (response.status) {
+      case 401:
+        toast.error('Sessão expirada. Faça login novamente.');
+        // Redirecionar para login ou limpar token
+        document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        window.location.href = '/login';
+        break;
+      case 403:
+        toast.error('Acesso negado.');
+        break;
+      case 404:
+        toast.error('Recurso não encontrado.');
+        break;
+      case 500:
+        toast.error('Erro interno do servidor. Tente novamente.');
+        break;
+      default:
+        toast.error(errorData.message || 'Erro na requisição');
+    }
+    
+    throw new Error(`HTTP Error: ${response.status} - ${errorData.message || response.statusText}`);
+  }
+  
+  return response;
+};
+
+/**
+ * Cliente HTTP principal
  */
 export const httpClient = {
   /**
-   * Realiza uma requisição fetch com tratamento de erros e tokens
+   * Método GET
    */
-  async fetch<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
-    const { requiresAuth = false, ...fetchOptions } = options;
+  get: async <T>(endpoint: string, options?: RequestInit): Promise<T> => {
+    const url = `${API_BASE_URL}${endpoint}`;
     
-    // Configuração padrão
-    const headers = new Headers(fetchOptions.headers || {});
-    headers.set('Content-Type', 'application/json');
-    
-    // Adiciona token de autenticação se necessário
-    if (requiresAuth) {
-      const token = getCookie('token');
-      if (!token) {
-        // Se não há token, redireciona para login se estiver no navegador
-        if (typeof window !== 'undefined') {
-          toast.error('Sua sessão expirou. Por favor, faça login novamente.');
-          window.location.href = '/login';
-        }
-        throw new Error('Autenticação necessária');
-      }
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-    
-    try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...fetchOptions,
-        headers
+    return withRetry(async () => {
+      const response = await fetch(url, {
+        ...defaultOptions,
+        ...options,
+        method: 'GET',
+        ...addAuthHeader({ ...defaultOptions, ...options }),
       });
       
-      // Log da resposta para debug
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers.get('content-type'));
+      await handleHttpError(response);
+      return response.json();
+    });
+  },
+
+  /**
+   * Método POST
+   */
+  post: async <T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> => {
+    const url = `${API_BASE_URL}${endpoint}`;
+    
+    return withRetry(async () => {
+      const response = await fetch(url, {
+        ...defaultOptions,
+        ...options,
+        method: 'POST',
+        body: data ? JSON.stringify(data) : undefined,
+        ...addAuthHeader({ ...defaultOptions, ...options }),
+      });
       
-      // Verifica se a resposta tem conteúdo
-      const contentType = response.headers.get('content-type');
-      const hasContent = contentType && contentType.includes('application/json');
+      await handleHttpError(response);
+      return response.json();
+    });
+  },
+
+  /**
+   * Método PUT
+   */
+  put: async <T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> => {
+    const url = `${API_BASE_URL}${endpoint}`;
+    
+    return withRetry(async () => {
+      const response = await fetch(url, {
+        ...defaultOptions,
+        ...options,
+        method: 'PUT',
+        body: data ? JSON.stringify(data) : undefined,
+        ...addAuthHeader({ ...defaultOptions, ...options }),
+      });
       
-      // Tratamento de erros HTTP
-      if (!response.ok) {
-        // Token expirado ou inválido
-        if (response.status === 401 && requiresAuth) {
-          if (typeof window !== 'undefined') {
-            toast.error('Sua sessão expirou. Por favor, faça login novamente.');
-            window.location.href = '/login';
-          }
-          throw new Error('Sessão expirada');
-        }
-        
-        // Outros erros HTTP - tenta parsear JSON, senão usa texto
-        let errorMessage = `Erro ${response.status}`;
-        if (hasContent) {
-          try {
-            const errorData = await response.json();
-            errorMessage = errorData.message || errorMessage;
-          } catch (parseError) {
-            // Se não conseguir parsear JSON, pega o texto
-            const errorText = await response.text();
-            errorMessage = errorText || errorMessage;
-          }
-        }
-        throw new Error(errorMessage);
-      }
+      await handleHttpError(response);
+      return response.json();
+    });
+  },
+
+  /**
+   * Método DELETE
+   */
+  delete: async <T>(endpoint: string, options?: RequestInit): Promise<T> => {
+    const url = `${API_BASE_URL}${endpoint}`;
+    
+    return withRetry(async () => {
+      const response = await fetch(url, {
+        ...defaultOptions,
+        ...options,
+        method: 'DELETE',
+        ...addAuthHeader({ ...defaultOptions, ...options }),
+      });
       
-      // Retorna dados da resposta se for JSON, senão retorna texto
-      if (hasContent) {
-      const data = await response.json();
-      return data;
-      } else {
-        // Se não for JSON, retorna o texto como resposta
-        const text = await response.text();
-        return text as unknown as T;
-      }
+      await handleHttpError(response);
+      return response.json();
+    });
+  },
+
+  /**
+   * Método para upload de arquivos
+   */
+  upload: async <T>(endpoint: string, formData: FormData, options?: RequestInit): Promise<T> => {
+    const url = `${API_BASE_URL}${endpoint}`;
+    
+    return withRetry(async () => {
+      const response = await fetch(url, {
+        ...options,
+        method: 'POST',
+        body: formData,
+        headers: {
+          // Não definir Content-Type para FormData (o navegador define automaticamente)
+          ...options?.headers,
+        },
+        mode: 'cors',
+        credentials: 'include',
+        ...addAuthHeader({ ...options, mode: 'cors', credentials: 'include' }),
+      });
+      
+      await handleHttpError(response);
+      return response.json();
+    });
+  },
+
+  /**
+   * Método para requisições customizadas
+   */
+  request: async <T>(endpoint: string, options: RequestInit): Promise<T> => {
+    const url = `${API_BASE_URL}${endpoint}`;
+    
+    return withRetry(async () => {
+      const response = await fetch(url, {
+        ...defaultOptions,
+        ...options,
+        ...addAuthHeader({ ...defaultOptions, ...options }),
+      });
+      
+      await handleHttpError(response);
+      return response.json();
+    });
+  },
+
+  /**
+   * Método para testar conectividade
+   */
+  healthCheck: async (): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/health`, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include',
+      });
+      
+      return response.ok;
     } catch (error) {
-      console.error('Erro na requisição:', error);
-      throw error;
+      console.error('Health check failed:', error);
+      return false;
     }
   },
-  
-  /**
-   * GET request
-   */
-  async get<T>(endpoint: string, requiresAuth = false): Promise<T> {
-    return this.fetch(endpoint, { method: 'GET', requiresAuth });
-  },
-  
-  /**
-   * POST request
-   */
-  async post<T>(endpoint: string, body: any, requiresAuth = false): Promise<T> {
-    return this.fetch(endpoint, { 
-      method: 'POST', 
-      body: JSON.stringify(body), 
-      requiresAuth
-    });
-  },
-  
-  /**
-   * PUT request
-   */
-  async put<T>(endpoint: string, body: any, requiresAuth = false): Promise<T> {
-    return this.fetch(endpoint, { 
-      method: 'PUT', 
-      body: JSON.stringify(body), 
-      requiresAuth
-    });
-  },
-  
-  /**
-   * DELETE request
-   */
-  async delete<T>(endpoint: string, requiresAuth = false): Promise<T> {
-    return this.fetch(endpoint, { 
-      method: 'DELETE',
-      requiresAuth
-    });
-  }
-}; 
+};
+
+// Configuração para debug
+if (typeof window !== 'undefined') {
+  console.log('🔧 HTTP Client configurado para:', API_BASE_URL);
+}
+
+export default httpClient; 

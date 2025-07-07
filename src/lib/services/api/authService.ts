@@ -6,70 +6,93 @@
  */
 
 import { httpClient } from './httpClient';
-import { clearAuthCookies } from '../../utils/cookies';
 
-export interface LoginParams {
+export interface LoginData {
   email: string;
   password: string;
 }
 
-export interface RegisterParams {
+export interface SignupData {
   email: string;
   password: string;
-}
-
-export interface User {
-  email: string;
-  role: string;
-  _id: string;
+  confirmPassword: string;
+  phone: string;
+  name: string;
 }
 
 export interface AuthResponse {
   success: boolean;
-  message: string;
+  message?: string;
   token?: string;
-  role?: string;
+  user?: {
+    id: string;
+    email: string;
+    name: string;
+    phone: string;
+    isAdmin: boolean;
+    createdAt: string;
+  };
 }
 
 export interface ProfileResponse {
   success: boolean;
-  data: User;
+  user?: {
+    id: string;
+    email: string;
+    name: string;
+    phone: string;
+    isAdmin: boolean;
+    createdAt: string;
+  };
+  message?: string;
 }
 
 /**
- * Serviço de autenticação
+ * Serviço de autenticação para gerenciar login, cadastro e perfil
  */
 export const authService = {
   /**
-   * Realiza o login do usuário
+   * Realizar login do usuário
    */
-  async login(params: LoginParams): Promise<AuthResponse> {
+  async login(data: LoginData): Promise<AuthResponse> {
     try {
-      return await httpClient.post<AuthResponse>('/api/auth/login', params);
+      return await httpClient.post<AuthResponse>('/api/auth/login', data);
     } catch (error) {
-      console.error('Erro no login:', error);
-      return { success: false, message: error instanceof Error ? error.message : 'Erro desconhecido' };
+      console.error('Erro ao fazer login:', error);
+      throw error;
     }
   },
 
   /**
-   * Registra um novo usuário
+   * Realizar cadastro do usuário
    */
-  async register(params: RegisterParams): Promise<AuthResponse> {
+  async signup(data: SignupData): Promise<AuthResponse> {
     try {
-      return await httpClient.post<AuthResponse>('/api/auth/register', params);
+      return await httpClient.post<AuthResponse>('/api/auth/signup', data);
     } catch (error) {
-      console.error('Erro no registro:', error);
-      return { success: false, message: error instanceof Error ? error.message : 'Erro desconhecido' };
+      console.error('Erro ao fazer cadastro:', error);
+      throw error;
     }
   },
 
   /**
-   * Obtém o perfil do usuário logado
+   * Fazer logout do usuário
+   */
+  async logout(): Promise<void> {
+    try {
+      await httpClient.post('/api/auth/logout');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      // Não propagar o erro, pois o logout sempre deve funcionar localmente
+    }
+  },
+
+  /**
+   * Obter perfil do usuário autenticado
    */
   async getProfile(): Promise<ProfileResponse> {
     try {
-      return await httpClient.get<ProfileResponse>('/api/auth/profile', true);
+      return await httpClient.get<ProfileResponse>('/api/auth/profile');
     } catch (error) {
       console.error('Erro ao obter perfil:', error);
       throw error;
@@ -77,21 +100,50 @@ export const authService = {
   },
 
   /**
-   * Verifica se o usuário tem acesso de administrador
+   * Atualizar perfil do usuário
    */
-  async checkAdminAccess(): Promise<AuthResponse> {
+  async updateProfile(data: Partial<SignupData>): Promise<ProfileResponse> {
     try {
-      return await httpClient.get<AuthResponse>('/api/auth/admin', true);
+      return await httpClient.put<ProfileResponse>('/api/auth/profile', data);
     } catch (error) {
-      console.error('Erro ao verificar acesso admin:', error);
-      return { success: false, message: error instanceof Error ? error.message : 'Acesso negado' };
+      console.error('Erro ao atualizar perfil:', error);
+      throw error;
     }
   },
 
   /**
-   * Realiza o logout do usuário
+   * Verificar se o usuário está autenticado
    */
-  logout(): void {
-    clearAuthCookies();
-  }
+  async checkAuth(): Promise<boolean> {
+    try {
+      const response = await this.getProfile();
+      return response.success;
+    } catch (error) {
+      return false;
+    }
+  },
+
+  /**
+   * Solicitar redefinição de senha
+   */
+  async requestPasswordReset(email: string): Promise<AuthResponse> {
+    try {
+      return await httpClient.post<AuthResponse>('/api/auth/reset-password', { email });
+    } catch (error) {
+      console.error('Erro ao solicitar redefinição de senha:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Confirmar redefinição de senha
+   */
+  async confirmPasswordReset(token: string, password: string): Promise<AuthResponse> {
+    try {
+      return await httpClient.post<AuthResponse>('/api/auth/confirm-reset', { token, password });
+    } catch (error) {
+      console.error('Erro ao confirmar redefinição de senha:', error);
+      throw error;
+    }
+  },
 }; 

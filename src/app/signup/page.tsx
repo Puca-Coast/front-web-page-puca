@@ -8,24 +8,27 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/contexts/AuthContext";
-import { REGEX, ERROR_MESSAGES } from "@/config/constants";
+import { authService } from "@/lib/services/api/authService";
+import { ERROR_MESSAGES, REGEX } from "../../../config/constants";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [celular, setCelular] = useState("");
+  const [nome, setNome] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
     senha?: string;
     confirmarSenha?: string;
     celular?: string;
+    nome?: string;
   }>({});
   const router = useRouter();
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
-  const { register, user } = useAuth();
+  const { user } = useAuth();
 
   // Redirecionar se já está logado
   useEffect(() => {
@@ -41,7 +44,13 @@ export default function Signup() {
       senha?: string;
       confirmarSenha?: string;
       celular?: string;
+      nome?: string;
     } = {};
+
+    // Validação do Nome
+    if (!nome) {
+      novosErros.nome = ERROR_MESSAGES.REQUIRED_FIELD;
+    }
 
     // Validação do Email
     if (!email) {
@@ -86,9 +95,15 @@ export default function Signup() {
 
     setLoading(true);
     try {
-      const success = await register(email, senha);
+      const response = await authService.signup({
+        email,
+        password: senha,
+        confirmPassword: confirmarSenha,
+        phone: celular,
+        name: nome,
+      });
       
-      if (success) {
+      if (response.success) {
         toast.success("Cadastro realizado com sucesso!");
         
         // Limpar campos
@@ -96,15 +111,18 @@ export default function Signup() {
         setSenha("");
         setConfirmarSenha("");
         setCelular("");
+        setNome("");
 
         // Redirecionar para a página de login com delay
         setTimeout(() => {
           router.push("/login");
         }, 2000);
+      } else {
+        toast.error(response.message || "Erro ao realizar cadastro.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao realizar cadastro:", error);
-      toast.error("Erro ao realizar cadastro. Tente novamente.");
+      toast.error(error.message || "Erro ao realizar cadastro. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -134,6 +152,27 @@ export default function Signup() {
             <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
               Criar Conta
             </h2>
+
+            {/* Campo de Nome */}
+            <div className="mb-4">
+              <label htmlFor="nome" className="block text-gray-700 mb-2 font-semibold">
+                Nome Completo *
+              </label>
+              <input
+                type="text"
+                id="nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                className={`w-full px-3 py-2 border ${
+                  errors.nome ? "border-red-500" : "border-gray-300"
+                } rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition-colors`}
+                placeholder="Digite seu nome completo"
+                required
+              />
+              {errors.nome && (
+                <p className="text-red-500 text-sm mt-1">{errors.nome}</p>
+              )}
+            </div>
 
             {/* Campo de Email */}
             <div className="mb-4">

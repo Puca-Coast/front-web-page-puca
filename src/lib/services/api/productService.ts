@@ -132,13 +132,7 @@ export const productService = {
    */
   async createProduct(formData: FormData): Promise<ProductResponse> {
     try {
-      return await httpClient.fetch<ProductResponse>('/api/products', {
-        method: 'POST',
-        body: formData,
-        requiresAuth: true,
-        // Não incluir Content-Type para que o navegador defina o boundary correto para multipart/form-data
-        headers: {}
-      });
+      return await httpClient.upload<ProductResponse>('/api/products', formData);
     } catch (error) {
       console.error('Erro ao criar produto:', error);
       throw error;
@@ -150,13 +144,7 @@ export const productService = {
    */
   async updateProduct(id: string, formData: FormData): Promise<ProductResponse> {
     try {
-      return await httpClient.fetch<ProductResponse>(`/api/products/${id}`, {
-        method: 'PUT',
-        body: formData,
-        requiresAuth: true,
-        // Não incluir Content-Type para que o navegador defina o boundary correto para multipart/form-data
-        headers: {}
-      });
+      return await httpClient.upload<ProductResponse>(`/api/products/${id}`, formData, { method: 'PUT' });
     } catch (error) {
       console.error(`Erro ao atualizar produto ${id}:`, error);
       throw error;
@@ -164,13 +152,13 @@ export const productService = {
   },
 
   /**
-   * Exclui um produto (requer permissão de administrador)
+   * Deletar produto (admin)
    */
   async deleteProduct(id: string): Promise<{ success: boolean; message: string }> {
     try {
-      return await httpClient.delete<{ success: boolean; message: string }>(`/api/products/${id}`, true);
+      return await httpClient.delete<{ success: boolean; message: string }>(`/api/products/${id}`);
     } catch (error) {
-      console.error(`Erro ao excluir produto ${id}:`, error);
+      console.error('Erro ao deletar produto:', error);
       throw error;
     }
   }

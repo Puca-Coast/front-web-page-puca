@@ -52,17 +52,11 @@ export const lookbookService = {
   },
 
   /**
-   * Adiciona fotos ao lookbook (requer permissão de administrador)
+   * Adiciona fotos ao lookbook (admin)
    */
   async addPhotos(formData: FormData): Promise<{ success: boolean; data: LookbookPhoto[] }> {
     try {
-      return await httpClient.fetch<{ success: boolean; data: LookbookPhoto[] }>('/api/lookbook/photos', {
-        method: 'POST',
-        body: formData,
-        requiresAuth: true,
-        // Não incluir Content-Type para que o navegador defina o boundary correto para multipart/form-data
-        headers: {}
-      });
+      return await httpClient.upload<{ success: boolean; data: LookbookPhoto[] }>('/api/lookbook/photos', formData);
     } catch (error) {
       console.error('Erro ao adicionar fotos ao lookbook:', error);
       throw error;
@@ -70,14 +64,14 @@ export const lookbookService = {
   },
 
   /**
-   * Atualiza uma foto do lookbook (requer permissão de administrador)
+   * Atualiza uma foto do lookbook (admin)
    */
   async updatePhoto(
     id: string,
     data: { description?: string; launch?: string }
   ): Promise<LookbookPhotoResponse> {
     try {
-      return await httpClient.put<LookbookPhotoResponse>(`/api/lookbook/photos/${id}`, data, true);
+      return await httpClient.put<LookbookPhotoResponse>(`/api/lookbook/photos/${id}`, data);
     } catch (error) {
       console.error(`Erro ao atualizar foto ${id}:`, error);
       throw error;
@@ -85,13 +79,37 @@ export const lookbookService = {
   },
 
   /**
-   * Exclui uma foto do lookbook (requer permissão de administrador)
+   * Exclui uma foto do lookbook (admin)
    */
   async deletePhoto(id: string): Promise<{ success: boolean; message: string }> {
     try {
-      return await httpClient.delete<{ success: boolean; message: string }>(`/api/lookbook/photos/${id}`, true);
+      return await httpClient.delete<{ success: boolean; message: string }>(`/api/lookbook/photos/${id}`);
     } catch (error) {
       console.error(`Erro ao excluir foto ${id}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Atualizar foto do lookbook (admin)
+   */
+  async updateLookbookPhoto(id: string, data: Partial<LookbookPhoto>): Promise<LookbookPhotoResponse> {
+    try {
+      return await httpClient.put<LookbookPhotoResponse>(`/api/lookbook/photos/${id}`, data);
+    } catch (error) {
+      console.error('Erro ao atualizar foto do lookbook:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Deletar foto do lookbook (admin)
+   */
+  async deleteLookbookPhoto(id: string): Promise<{ success: boolean; message: string }> {
+    try {
+      return await httpClient.delete<{ success: boolean; message: string }>(`/api/lookbook/photos/${id}`);
+    } catch (error) {
+      console.error('Erro ao deletar foto do lookbook:', error);
       throw error;
     }
   }

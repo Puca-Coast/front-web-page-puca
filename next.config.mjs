@@ -1,38 +1,63 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    // Configurações experimentais atualizadas para Next.js 15
-    optimizeCss: true,
-    cpus: 1,
+    optimizePackageImports: ['framer-motion'],
   },
-  
-  // Configurações de imagem otimizadas
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**',
       },
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '3000',
+        hostname: 'cloudinary.com',
+        port: '',
+        pathname: '/**',
       },
     ],
-    formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 31536000,
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  
-  // Headers de segurança e performance
+  webpack: (config, { isServer }) => {
+    // Configuração específica para assets estáticos
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+
+    // Otimização para assets estáticos
+    config.module.rules.push({
+      test: /\.(png|jpe?g|gif|svg|webp|avif)$/i,
+      type: 'asset/resource',
+      generator: {
+        filename: 'static/images/[name].[hash][ext]',
+      },
+    });
+
+    return config;
+  },
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: '/assets/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*',
         headers: [
           {
             key: 'X-Content-Type-Options',
@@ -40,7 +65,7 @@ const nextConfig = {
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY',
+            value: 'SAMEORIGIN',
           },
           {
             key: 'X-XSS-Protection',
@@ -49,6 +74,20 @@ const nextConfig = {
         ],
       },
     ];
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://puca-api.vercel.app'}/api/:path*`,
+      },
+    ];
+  },
+  trailingSlash: false,
+  poweredByHeader: false,
+  compress: true,
+  env: {
+    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
   },
 };
 

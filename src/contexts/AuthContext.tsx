@@ -1,143 +1,133 @@
 "use client";
 
+import React from 'react';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService, User } from '../lib/services/api/authService';
+import { authService } from '../lib/services/api/authService';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'react-toastify';
 import { getCookie, setAuthCookies, clearAuthCookies, isTokenExpired } from '../lib/utils/cookies';
 
+// Interface do usuário no contexto
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  phone: string;
+  isAdmin: boolean;
+  createdAt: string;
+}
+
 interface AuthContextType {
   user: User | null;
+  isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  checkAuth: () => Promise<boolean>;
+  checkAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface JwtPayload {
-  exp: number;
-  userId: string;
-  email: string;
-  role: string;
-}
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
-
-  // Verifica token ao carregar o componente
-  useEffect(() => {
-    const verifyToken = async () => {
-      await checkAuth();
-      setIsLoading(false);
-    };
-    verifyToken();
-  }, []);
-
-  // Verifica a autenticação do usuário
-  const checkAuth = async (): Promise<boolean> => {
-    const token = getCookie('token');
-    
-    if (!token || isTokenExpired(token)) {
-      setUser(null);
-      return false;
-    }
-
-    try {
-      const response = await authService.getProfile();
-      if (response.success) {
-        setUser(response.data);
-        return true;
-      } else {
-        setUser(null);
-        return false;
-      }
-    } catch {
-      setUser(null);
-      return false;
-    }
-  };
-
-  // Login de usuário
-  const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      const response = await authService.login({ email, password });
-      
-      if (response.success && response.token) {
-        // Armazena tokens em cookies seguros em vez de localStorage
-        setAuthCookies(response.token, response.role || 'user');
-        
-        await checkAuth();
-        return true;
-      } else {
-        toast.error(response.message || 'Erro ao fazer login.');
-        return false;
-      }
-    } catch (error) {
-      toast.error('Erro ao fazer login. Tente novamente.');
-      return false;
-    }
-  };
-
-  // Registro de usuário
-  const register = async (email: string, password: string): Promise<boolean> => {
-    try {
-      const response = await authService.register({ email, password });
-      
-      if (response.success) {
-        toast.success('Registro realizado com sucesso!');
-        return true;
-      } else {
-        toast.error(response.message || 'Erro ao realizar cadastro.');
-        return false;
-      }
-    } catch (error) {
-      toast.error('Erro ao realizar cadastro. Tente novamente.');
-      return false;
-    }
-  };
-
-  // Logout
-  const logout = () => {
-    // Remove tokens dos cookies
-    clearAuthCookies();
-    setUser(null);
-    router.push('/login');
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAdmin: user?.role === 'admin',
-        isLoading,
-        login,
-        register,
-        logout,
-        checkAuth
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
   return context;
 };
 
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  const checkAuth = async () => {
+    try {
+      setIsLoading(true);
+      const token = getCookie('auth_token');
+      
+      if (!token || isTokenExpired(token)) {
+        clearAuthCookies();
+        setUser(null);
+        setIsAuthenticated(false);
+        return;
+      }
+
+      const response = await authService.getProfile();
+      
+      if (response.success && response.user) {
+        setUser(response.user);
+        setIsAuthenticated(true);
+      } else {
+        clearAuthCookies();
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      console.error('Erro ao verificar autenticação:', error);
+      clearAuthCookies();
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await authService.login({ email, password });
+      
+      if (response.success && response.token && response.user) {
+        setAuthCookies(response.token, response.user.isAdmin ? 'admin' : 'user');
+        setUser(response.user);
+        setIsAuthenticated(true);
+        toast.success('Login realizado com sucesso!');
+        return true;
+      } else {
+        toast.error(response.message || 'Erro ao fazer login');
+        return false;
+      }
+    } catch (error: any) {
+      console.error('Erro no login:', error);
+      toast.error(error.message || 'Erro ao fazer login');
+      return false;
+    }
+  };
+
+  const logout = () => {
+    clearAuthCookies();
+    setUser(null);
+    setIsAuthenticated(false);
+    toast.info('Logout realizado com sucesso');
+    router.push('/');
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const value: AuthContextType = {
+    user,
+    isAuthenticated,
+    isAdmin: user?.isAdmin || false,
+    isLoading,
+    login,
+    logout,
+    checkAuth,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
 // HOC para proteger rotas (client-side)
-export const withAuth = (Component: React.ComponentType) => {
+export const withAuth = (Component: any) => {
   return function AuthenticatedComponent(props: any) {
     const { user, isLoading } = useAuth();
     const router = useRouter();
@@ -157,7 +147,7 @@ export const withAuth = (Component: React.ComponentType) => {
 };
 
 // HOC para proteger rotas de administrador (client-side)
-export const withAdminAuth = (Component: React.ComponentType) => {
+export const withAdminAuth = (Component: any) => {
   return function AdminComponent(props: any) {
     const { user, isAdmin, isLoading } = useAuth();
     const router = useRouter();
