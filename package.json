@@ -40,6 +40,7 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9.22.0",
     "eslint-config-next": "15.2.2",
+    "lightningcss": "^1.30.1",
     "next-sitemap": "^4.2.3",
     "postcss": "^8.5.6",
     "postcss-flexbugs-fixes": "^5.0.2",

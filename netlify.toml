@@ -6,13 +6,14 @@
   NODE_ENV = "production"
   NEXT_TELEMETRY_DISABLED = "1"
   NPM_FLAGS = "--legacy-peer-deps"
+  LIGHTNINGCSS_BINARY_PATH = ""
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["sharp"]
+  external_node_modules = ["sharp", "lightningcss"]
 
 [[headers]]
   for = "/*"
