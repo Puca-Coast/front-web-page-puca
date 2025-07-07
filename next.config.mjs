@@ -4,6 +4,11 @@ const nextConfig = {
     optimizePackageImports: ['framer-motion'],
   },
   images: {
+    // Configuração específica para resolver problemas no Netlify
+    loader: 'custom',
+    loaderFile: './src/lib/cloudinary.ts',
+    
+    // Domínios permitidos para imagens externas
     remotePatterns: [
       {
         protocol: 'https',
@@ -18,11 +23,23 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+    
+    // Formatos otimizados
     formats: ['image/avif', 'image/webp'],
+    
+    // Configurações de cache e qualidade
     minimumCacheTTL: 31536000,
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    
+    // Tamanhos responsivos padrão
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    
+    // Desabilitar otimização automática para URLs externas no Netlify
+    unoptimized: process.env.NETLIFY === 'true',
   },
+  
   webpack: (config, { isServer }) => {
     // Configuração específica para assets estáticos
     if (!isServer) {
@@ -45,6 +62,7 @@ const nextConfig = {
 
     return config;
   },
+  
   async headers() {
     return [
       {
@@ -71,10 +89,15 @@ const nextConfig = {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
         ],
       },
     ];
   },
+  
   async rewrites() {
     return [
       {
@@ -83,12 +106,37 @@ const nextConfig = {
       },
     ];
   },
-  trailingSlash: false,
-  poweredByHeader: false,
+  
+  // Configurações de performance
+  swcMinify: true,
   compress: true,
+  poweredByHeader: false,
+  trailingSlash: false,
+  
+  // Configurações de ambiente
   env: {
     NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   },
+  
+  // Configurações de build
+  typescript: {
+    // !! WARN !!
+    // Permite builds de produção com erros de TypeScript
+    // Remover em produção
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    // Permite builds com warnings de ESLint
+    ignoreDuringBuilds: false,
+  },
+  
+  // Configurações específicas para Netlify
+  ...(process.env.NETLIFY === 'true' && {
+    output: 'export',
+    distDir: 'out',
+    trailingSlash: true,
+  }),
 };
 
 export default nextConfig;

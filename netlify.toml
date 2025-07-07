@@ -5,6 +5,7 @@
 [build.environment]
   NODE_ENV = "production"
   NEXT_TELEMETRY_DISABLED = "1"
+  NETLIFY = "true"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
@@ -19,6 +20,7 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     X-XSS-Protection = "1; mode=block"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data: https://res.cloudinary.com https://cloudinary.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
 
 [[headers]]
   for = "/assets/*"
@@ -45,21 +47,41 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+[[headers]]
+  for = "*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_next/image*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    X-Robots-Tag = "noindex"
+
 [[redirects]]
   from = "/api/*"
   to = "https://puca-api.vercel.app/api/:splat"
   status = 200
   force = true
 
-# Configuração para SPA (Single Page Application)
+[[redirects]]
+  from = "/_next/image*"
+  to = "https://res.cloudinary.com/:splat"
+  status = 301
+  force = false
+  conditions = {Query = {url = "https://res.cloudinary.com/*"}}
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
   conditions = {Role = ["admin"]}
 
-# Configuração para assets estáticos
 [[redirects]]
   from = "/assets/*"
   to = "/assets/:splat"
   status = 200
+
+[[edge_functions]]
+  function = "image-optimizer"
+  path = "/_next/image/*"
