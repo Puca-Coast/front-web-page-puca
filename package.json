@@ -15,11 +15,16 @@
     "@tailwindcss/postcss": "^4.0.14",
     "@types/jwt-decode": "^3.1.0",
     "animejs": "3.2.1",
+    "autoprefixer": "^10.4.21",
     "critters": "^0.0.25",
     "framer-motion": "^12.12.1",
     "jwt-decode": "^4.0.0",
+    "lightningcss": "^1.30.1",
     "next": "^15.3.2",
     "next-images": "^1.8.5",
+    "postcss": "^8.5.6",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-preset-env": "^10.2.4",
     "react": "^19.0.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.0.0",
@@ -28,7 +33,8 @@
     "react-intersection-observer": "^9.16.0",
     "react-router-dom": "^7.3.0",
     "react-toastify": "^11.0.5",
-    "swiper": "^11.2.5"
+    "swiper": "^11.2.5",
+    "tailwindcss": "^4.0.14"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
@@ -37,15 +43,9 @@
     "@types/react-dom": "^19.1.5",
     "@types/react-input-mask": "^3.0.6",
     "@types/react-toastify": "^4.1.0",
-    "autoprefixer": "^10.4.21",
     "eslint": "^9.22.0",
     "eslint-config-next": "15.2.2",
-    "lightningcss": "^1.30.1",
     "next-sitemap": "^4.2.3",
-    "postcss": "^8.5.6",
-    "postcss-flexbugs-fixes": "^5.0.2",
-    "postcss-preset-env": "^10.2.4",
-    "tailwindcss": "^4.0.14",
     "typescript": "^5.8.3"
   }
 }

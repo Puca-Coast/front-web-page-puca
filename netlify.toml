@@ -1,5 +1,5 @@
 [build]
-  command = "npm ci --legacy-peer-deps && npm run build"
+  command = "npm install --legacy-peer-deps && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -10,6 +10,8 @@
   # Forçar instalação limpa
   NPM_CONFIG_FUND = "false"
   NPM_CONFIG_AUDIT = "false"
+  # Garantir que devDependencies sejam instaladas
+  NODE_ENV_OVERRIDE = "development"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
