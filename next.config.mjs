@@ -126,13 +126,6 @@ const nextConfig = {
     // Permite builds com warnings de ESLint
     ignoreDuringBuilds: false,
   },
-  
-  // Configurações específicas para Netlify
-  ...(process.env.NETLIFY === 'true' && {
-    output: 'export',
-    distDir: 'out',
-    trailingSlash: true,
-  }),
 };
 
 export default nextConfig;

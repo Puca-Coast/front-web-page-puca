@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build"
+  command = "npm ci --legacy-peer-deps && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -7,6 +7,9 @@
   NEXT_TELEMETRY_DISABLED = "1"
   NPM_FLAGS = "--legacy-peer-deps"
   LIGHTNINGCSS_BINARY_PATH = ""
+  # Forçar instalação limpa
+  NPM_CONFIG_FUND = "false"
+  NPM_CONFIG_AUDIT = "false"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
