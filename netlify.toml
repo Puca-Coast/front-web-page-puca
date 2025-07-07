@@ -5,13 +5,13 @@
 [build.environment]
   NODE_ENV = "production"
   NEXT_TELEMETRY_DISABLED = "1"
-  NETLIFY = "true"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["sharp"]
 
 [[headers]]
   for = "/*"
@@ -20,7 +20,7 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     X-XSS-Protection = "1; mode=block"
-    Content-Security-Policy = "default-src 'self'; img-src 'self' data: https://res.cloudinary.com https://cloudinary.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data: https://res.cloudinary.com https://cloudinary.com blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' https://puca-api.vercel.app https://res.cloudinary.com;"
 
 [[headers]]
   for = "/assets/*"
@@ -85,3 +85,13 @@
 [[edge_functions]]
   function = "image-optimizer"
   path = "/_next/image/*"
+
+# Configurações de performance
+[dev]
+  framework = "next"
+  targetPort = 3000
+  publish = ".next"
+
+# Configurações de imagem
+[images]
+  remote_images = ["https://res.cloudinary.com/**", "https://cloudinary.com/**"]

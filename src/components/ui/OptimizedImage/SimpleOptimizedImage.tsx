@@ -28,6 +28,7 @@ interface SimpleOptimizedImageProps {
   priority?: boolean;
   quality?: number;
   sizes?: string;
+  objectFit?: 'fill' | 'contain' | 'cover' | 'none' | 'scale-down';
 }
 
 export const SimpleOptimizedImage: React.FC<SimpleOptimizedImageProps> = ({
@@ -41,6 +42,7 @@ export const SimpleOptimizedImage: React.FC<SimpleOptimizedImageProps> = ({
   priority = false,
   quality = CLOUDINARY_QUALITY.HIGH,
   sizes,
+  objectFit = 'cover',
 }) => {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,12 +54,13 @@ export const SimpleOptimizedImage: React.FC<SimpleOptimizedImageProps> = ({
         height,
         quality,
         format: 'auto',
-        crop: 'limit',
+        crop: objectFit === 'cover' ? 'fill' : 'limit',
       })
     : src;
 
   // Handler para erro de imagem
   const handleImageError = () => {
+    console.error(`Failed to load image: ${src}`);
     setImageError(true);
     setIsLoading(false);
   };
@@ -70,51 +73,48 @@ export const SimpleOptimizedImage: React.FC<SimpleOptimizedImageProps> = ({
   // Se houver erro e fallback estiver habilitado
   if (imageError && enableFallback) {
     return (
-      <div className="relative bg-gray-100 flex items-center justify-center" style={{ width, height }}>
+      <div 
+        className={`relative bg-gray-100 flex items-center justify-center ${className}`} 
+        style={{ width, height }}
+      >
         <img
           src={fallbackSrc}
           alt={`${alt} (fallback)`}
-          className={`${className} opacity-75 max-w-full max-h-full object-contain`}
-          style={{ width: 'auto', height: 'auto' }}
+          className="opacity-50 max-w-[80%] max-h-[80%] object-contain"
+          style={{ filter: 'grayscale(100%)' }}
         />
       </div>
     );
   }
 
-  // Para imagens do Cloudinary, usar tag img nativa
-  if (isCloudinaryImage(src)) {
-    return (
-      <div className="relative" style={{ width, height }}>
-        {isLoading && (
-          <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-            <div className="w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
-          </div>
-        )}
-        <img
-          src={optimizedSrc}
-          alt={alt}
-          className={`${className} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          onError={handleImageError}
-          onLoad={handleImageLoad}
-          loading={priority ? 'eager' : 'lazy'}
-        />
-      </div>
-    );
-  }
-
-  // Para outras imagens, usar Next.js Image
+  // Usar Next/Image com unoptimized para todas as imagens
+  // já que configuramos unoptimized: true no next.config.mjs
   return (
-    <div className="relative">
+    <div className={`relative ${className}`} style={{ width, height }}>
+      {isLoading && (
+        <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+          <div className="w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
+        </div>
+      )}
       <Image
         src={optimizedSrc}
         alt={alt}
         width={width}
         height={height}
-        className={className}
+        className={`${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        style={{ objectFit }}
+        onLoadingComplete={(result) => {
+          if (result.naturalWidth === 0) {
+            // Broken image
+            handleImageError();
+          } else {
+            handleImageLoad();
+          }
+        }}
         priority={priority}
         quality={quality}
         sizes={sizes}
+        unoptimized={true}
       />
     </div>
   );

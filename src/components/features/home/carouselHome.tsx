@@ -8,6 +8,7 @@ import { useInView } from "react-intersection-observer";
 import WavyLoader from "@/components/ui/WavyLoader";
 import { lookbookService, LookbookPhoto } from "@/lib/services/api/lookbookService";
 import { CarouselHomeProps } from "@/types";
+import { SimpleLookbookImage } from "@/components/ui/OptimizedImage/SimpleOptimizedImage";
 
 // Import Swiper styles
 import "swiper/css";
@@ -138,16 +139,14 @@ const OptimizedImage = ({ photo, index, isPriority }: {
       }`}
     >
       {(inView || isPriority) && (
-        <Image
+        <SimpleLookbookImage
           src={photo.url}
           alt={photo.description || `Lookbook ${index + 1}`}
-          fill
-          sizes={sizes}
-          className="object-cover"
+          width={1920}
+          height={1080}
+          className="w-full h-full object-cover"
           priority={isPriority}
-          quality={isPriority ? 90 : 75}
-          onLoadingComplete={handleLoad}
-          loading={isPriority ? "eager" : "lazy"}
+          sizes={sizes}
         />
       )}
       

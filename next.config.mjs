@@ -4,9 +4,9 @@ const nextConfig = {
     optimizePackageImports: ['framer-motion'],
   },
   images: {
-    // Configuração específica para resolver problemas no Netlify
-    loader: 'custom',
-    loaderFile: './src/lib/cloudinary.ts',
+    // Desabilitar otimização de imagens do Next.js completamente
+    // Cloudinary já faz a otimização, não precisamos processar novamente
+    unoptimized: true,
     
     // Domínios permitidos para imagens externas
     remotePatterns: [
@@ -35,9 +35,6 @@ const nextConfig = {
     // Tamanhos responsivos padrão
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    
-    // Desabilitar otimização automática para URLs externas no Netlify
-    unoptimized: process.env.NETLIFY === 'true',
   },
   
   webpack: (config, { isServer }) => {
