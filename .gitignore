@@ -4,12 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+.pnp.cjs
+.pnp.loader.mjs
 
 # testing
 /coverage
@@ -39,6 +35,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+yarn.lock
+
+# npm
+package-lock.json
 
 # sitemap
 /public/robots.txt
