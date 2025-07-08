@@ -17,7 +17,7 @@ interface LookbookPhotoItem {
 
 export default function LookbookPage() {
   const [photos, setPhotos] = useState<LookbookPhotoItem[]>([]);
-  const [page, setPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,66 +37,70 @@ export default function LookbookPage() {
     };
   }, []);
 
-  // Buscar fotos com otimização
-  const fetchPhotos = useCallback(
-    async (pageToFetch: number) => {
-      if (!hasMore || isLoading) return;
+  // Função para buscar as fotos usando o serviço
+  const fetchPhotos = useCallback(async () => {
+    if (isLoading || !hasMore || controllerRef.current?.signal.aborted) return;
+    setIsLoading(true);
+    setError(null);
 
+    try {
+      // Cancelar requisição anterior se existir
       if (controllerRef.current) {
         controllerRef.current.abort();
       }
+      
+      // Criar novo controller para esta requisição
+      controllerRef.current = new AbortController();
 
-      const controller = new AbortController();
-      controllerRef.current = controller;
+      console.log(`🔍 Buscando fotos - Página: ${currentPage}, Limite: 10`);
+      
+      // Usar o serviço de lookbook
+      const response = await lookbookService.getPhotos(currentPage, 10, 'primavera2024');
+      
+      console.log('📸 Resposta da API:', {
+        success: response.success,
+        totalFotos: response.data.length,
+        pagination: response.pagination
+      });
 
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const response = await lookbookService.getPhotos(pageToFetch, 10);
-
-        if (!response.success) {
-          throw new Error("Erro ao buscar fotos do lookbook");
+      if (response.success && response.data) {
+        const newPhotos = response.data.map(mapPhotoToItem);
+        
+        // Se for a primeira página, substituir; senão, adicionar
+        if (currentPage === 1) {
+          setPhotos(newPhotos);
+        } else {
+          setPhotos((prev) => [...prev, ...newPhotos]);
         }
-
-        if (response.data.length === 0) {
-          setHasMore(false);
-          return;
-        }
-
-        const mappedPhotos = response.data.map(mapPhotoToItem);
-
-        setPhotos((prev) => {
-          const existingIds = new Set(prev.map((p) => p.id));
-          const newPhotos = mappedPhotos.filter((p) => !existingIds.has(p.id));
-          return [...prev, ...newPhotos];
-        });
-
+        
+        // Atualizar controles de paginação
+        setCurrentPage((prev) => prev + 1);
         setHasMore(response.pagination.currentPage < response.pagination.totalPages);
-
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Erro ao buscar fotos:", err);
-          setError(err.message || "Erro ao carregar fotos");
-          setHasMore(false);
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsLoading(false);
-        }
+      } else {
+        console.error("❌ Erro na resposta da API:", response);
+        setError('Erro ao carregar fotos do lookbook');
       }
-    },
-    [hasMore, isLoading, mapPhotoToItem]
-  );
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.log('📡 Requisição cancelada');
+        return;
+      }
+      
+      console.error("❌ Erro ao conectar com a API:", error);
+      setError('Erro ao carregar fotos. Tente novamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, isLoading, hasMore, mapPhotoToItem]);
 
   // Intersection observer para infinite scroll
   const onIntersect = useCallback(
     ([entry]: IntersectionObserverEntry[]) => {
       if (entry.isIntersecting && hasMore && !isLoading) {
-        setPage((prev) => prev + 1);
+        fetchPhotos();
       }
     },
-    [hasMore, isLoading]
+    [hasMore, isLoading, fetchPhotos]
   );
 
   // Configurar observer
@@ -118,18 +122,11 @@ export default function LookbookPage() {
     };
   }, [onIntersect]);
 
-  // Fetch when page changes
-  useEffect(() => {
-    if (page > 1) {
-      fetchPhotos(page);
-    }
-  }, [page, fetchPhotos]);
-
   // Carregar primeira página
   useEffect(() => {
     if (!isInitialized) {
       setIsInitialized(true);
-      fetchPhotos(1);
+      fetchPhotos();
     }
   }, [isInitialized, fetchPhotos]);
 
@@ -175,7 +172,7 @@ export default function LookbookPage() {
               <button
                 onClick={() => {
                   setError(null);
-                  setPage(1);
+                  setCurrentPage(1);
                   setHasMore(true);
                   setIsInitialized(false);
                 }}
