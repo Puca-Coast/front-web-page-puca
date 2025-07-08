@@ -58,6 +58,8 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, './src'),
+      '@/config': path.resolve(__dirname, './config'),
+      '@/public': path.resolve(__dirname, './public'),
     };
 
     // Otimização para assets estáticos
