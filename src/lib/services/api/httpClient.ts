@@ -21,6 +21,9 @@ const getApiBaseUrl = (): string => {
 
 const API_BASE_URL = getApiBaseUrl();
 
+// Cache bust para forçar novas requisições
+const CACHE_BUST = `?v=${Date.now()}`;
+
 // Configuração para retry automático
 const RETRY_ATTEMPTS = 3;
 const RETRY_DELAY = 1000; // 1 segundo
@@ -118,7 +121,7 @@ export const httpClient = {
    * Método GET
    */
   get: async <T>(endpoint: string, options?: RequestInit): Promise<T> => {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}${CACHE_BUST}`;
     
     return withRetry(async () => {
       const response = await fetch(url, {
@@ -137,7 +140,7 @@ export const httpClient = {
    * Método POST
    */
   post: async <T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> => {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}${CACHE_BUST}`;
     
     return withRetry(async () => {
       const response = await fetch(url, {
@@ -157,7 +160,7 @@ export const httpClient = {
    * Método PUT
    */
   put: async <T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> => {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}${CACHE_BUST}`;
     
     return withRetry(async () => {
       const response = await fetch(url, {
@@ -177,7 +180,7 @@ export const httpClient = {
    * Método DELETE
    */
   delete: async <T>(endpoint: string, options?: RequestInit): Promise<T> => {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}${CACHE_BUST}`;
     
     return withRetry(async () => {
       const response = await fetch(url, {
@@ -196,7 +199,7 @@ export const httpClient = {
    * Método para upload de arquivos
    */
   upload: async <T>(endpoint: string, formData: FormData, options?: RequestInit): Promise<T> => {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}${CACHE_BUST}`;
     
     return withRetry(async () => {
       const authOptions = addAuthHeader({ ...options, mode: 'cors' });
@@ -219,7 +222,7 @@ export const httpClient = {
    * Método para requisições customizadas
    */
   request: async <T>(endpoint: string, options: RequestInit): Promise<T> => {
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}${CACHE_BUST}`;
     
     return withRetry(async () => {
       const response = await fetch(url, {
