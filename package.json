@@ -15,6 +15,8 @@
     "@tailwindcss/postcss": "^4.0.14",
     "@types/jwt-decode": "^3.1.0",
     "@types/node": "^22.15.21",
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.5",
     "animejs": "3.2.1",
     "autoprefixer": "^10.4.21",
     "critters": "^0.0.25",
@@ -40,8 +42,6 @@
   },
   "devDependencies": {
     "@types/prop-types": "^15.7.14",
-    "@types/react": "^19.1.4",
-    "@types/react-dom": "^19.1.5",
     "@types/react-input-mask": "^3.0.6",
     "@types/react-toastify": "^4.1.0",
     "eslint": "^9.22.0",
