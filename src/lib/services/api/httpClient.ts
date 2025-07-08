@@ -54,11 +54,10 @@ const defaultOptions: RequestInit = {
     'Accept': 'application/json',
   },
   mode: 'cors',
-  credentials: 'include',
 };
 
 /**
- * Interceptor para adicionar token de autenticação
+ * Interceptor para adicionar token de autenticação e credenciais quando necessário
  */
 const addAuthHeader = (options: RequestInit): RequestInit => {
   const token = getCookie('auth_token');
@@ -70,6 +69,7 @@ const addAuthHeader = (options: RequestInit): RequestInit => {
         ...options.headers,
         Authorization: `Bearer ${token}`,
       },
+      credentials: 'include',
     };
   }
   
@@ -199,17 +199,15 @@ export const httpClient = {
     const url = `${API_BASE_URL}${endpoint}`;
     
     return withRetry(async () => {
+      const authOptions = addAuthHeader({ ...options, mode: 'cors' });
       const response = await fetch(url, {
-        ...options,
+        ...authOptions,
         method: 'POST',
         body: formData,
         headers: {
           // Não definir Content-Type para FormData (o navegador define automaticamente)
-          ...options?.headers,
+          ...authOptions?.headers,
         },
-        mode: 'cors',
-        credentials: 'include',
-        ...addAuthHeader({ ...options, mode: 'cors', credentials: 'include' }),
       });
       
       await handleHttpError(response);
@@ -243,7 +241,6 @@ export const httpClient = {
       const response = await fetch(`${API_BASE_URL}/api/health`, {
         method: 'GET',
         mode: 'cors',
-        credentials: 'include',
       });
       
       return response.ok;
