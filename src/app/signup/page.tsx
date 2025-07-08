@@ -9,7 +9,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/contexts/AuthContext";
 import { authService } from "@/lib/services/api/authService";
-import { ERROR_MESSAGES, REGEX } from "../../../config/constants";
+import { ERROR_MESSAGES, REGEX } from "@/config/constants";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
