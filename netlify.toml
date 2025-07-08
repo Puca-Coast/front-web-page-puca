@@ -59,12 +59,6 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-[[headers]]
-  for = "/_next/image*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    X-Robots-Tag = "noindex"
-
 [[redirects]]
   from = "/api/*"
   to = "https://puca-api.vercel.app/api/:splat"
@@ -72,33 +66,12 @@
   force = true
 
 [[redirects]]
-  from = "/_next/image*"
-  to = "https://res.cloudinary.com/:splat"
-  status = 301
-  force = false
-  conditions = {Query = {url = "https://res.cloudinary.com/*"}}
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  conditions = {Role = ["admin"]}
-
-[[redirects]]
   from = "/assets/*"
   to = "/assets/:splat"
   status = 200
-
-[[edge_functions]]
-  function = "image-optimizer"
-  path = "/_next/image/*"
 
 # Configurações de performance
 [dev]
   framework = "next"
   targetPort = 3000
   publish = ".next"
-
-# Configurações de imagem
-[images]
-  remote_images = ["https://res.cloudinary.com/**", "https://cloudinary.com/**"]
