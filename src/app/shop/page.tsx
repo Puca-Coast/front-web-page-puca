@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import { motion } from "framer-motion";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useRouter } from "next/navigation";
-import anime from "animejs/lib/anime.js";
 import Image from "next/image";
 import { productService, Product } from "@/lib/services/api/productService";
 
@@ -93,46 +93,48 @@ export default function Shop() {
     };
   }, [fetchProducts]);
 
-  // Animação entrada sofisticada
-  useEffect(() => {
-    if (items.length === 0) return;
-    
-    const elements = document.querySelectorAll(".shop-item");
-    if (elements.length === 0) return;
-    
-    anime({
-      targets: elements,
-      opacity: [0, 1],
-      translateY: [60, 0],
-      scale: [0.8, 1],
-      easing: "easeOutCubic",
-      duration: 1000,
-      delay: anime.stagger(120),
-    });
-  }, [items]);
-
   const handleProductClick = (productId: string) => {
     router.push(`/product/${productId}`);
   };
 
+  // Variantes de animação para Framer Motion
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.12,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 60, 
+      scale: 0.8 
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: {
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }
+    }
+  };
+
   return (
     <>
-    <div className="bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      {/* Grid Pattern Background Elegante */}
-      <div className="absolute inset-0 opacity-[0.02]">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `
-            linear-gradient(rgba(0,0,0,0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)
-          `,
-          backgroundSize: '40px 40px'
-        }} />
-      </div>
-
-      <Header isHome={false} />
-
-      {/* CORRIGIDO: Scroll permitido */}
-      <main className="puca-page-content relative z-10">
+    <Header isHome={false} />
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-scroll" style={{
+      width: '100vw',
+      height: '100vh',
+    }}>
+      
+      <main className="puca-page-content z-10 w-full flex-1">
         
         {loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mx-auto">
@@ -160,51 +162,58 @@ export default function Shop() {
         )}
 
         {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mx-auto">
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full mx-auto"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             {items.map((item, i) => (
-              <div
+              <motion.div
                 key={item._id}
-                className="group relative cursor-pointer transition-all duration-300"
-                style={{
-                  width: '35.2em'
-                }}
+                className="group relative cursor-pointer transition-all duration-300 w-full"
+                variants={itemVariants}
                 onMouseEnter={() => setHoverIdx(i)}
                 onMouseLeave={() => setHoverIdx(null)}
                 onClick={() => handleProductClick(item._id)}
+                whileHover={{ 
+                  scale: 1.02,
+                  transition: { duration: 0.2 }
+                }}
               >
-                {/* Card Container minimalista */}
-                <div className="relative overflow-hidden">
+               
+                <div className="relative">
                   
-                  {/* Imagem do produto - design clean */}
-                  <div className="relative w-full aspect-[3/4] overflow-hidden bg-white group" >
+         
+                  <div className="relative w-full bg-white group aspect-[3/4] lg:aspect-auto lg:h-[calc(100vh-80px)]">
                     
-                    {/* Imagem principal */}
+     
                     <Image
                       src={item.imageUrl}
                       alt={item.name}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className={`
-                        object-contain transition-all duration-500
+                        object-contain lg:object-cover transition-all duration-500
                         ${hoverIdx === i ? 'opacity-0' : 'opacity-100'}
                       `}
                       priority={i < 6}
                     />
                     
-                    {/* Imagem hover */}
+              
                     <Image
                       src={item.hoverImageUrl}
                       alt={`${item.name} - hover`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className={`
-                        object-cover absolute top-0 left-0 transition-all duration-500
+                        object-cover absolute inset-0 transition-all duration-500
                         ${hoverIdx === i ? 'opacity-100' : 'opacity-0'}
                       `}
                     />
                   </div>
 
-                  {/* Informações do produto dentro do card */}
+            
                   <div className="absolute bottom-0 left-0 right-0 p-4 bg-transparent backdrop-blur-sm">
                     <h3 className="text-sm font-medium text-gray-900 uppercase tracking-tight line-clamp-1">
                       {item.name}
@@ -217,13 +226,14 @@ export default function Shop() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </main>
-      <Footer isHome={false} />
     </div>
-     </>
+    <Footer isHome={false} />
+
+    </>
   );
 }

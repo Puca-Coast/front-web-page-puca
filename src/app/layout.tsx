@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CartProvider } from "@/contexts/CartContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import QueryProvider from "@/lib/providers/QueryProvider";
 import { Inter, Jura } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -30,12 +31,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${jura.variable} flex flex-col min-h-screen`}>
-        <AuthProvider>
-          <CartProvider>
-            {children}
-            <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
-          </CartProvider>
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <CartProvider>
+              {children}
+              <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+            </CartProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

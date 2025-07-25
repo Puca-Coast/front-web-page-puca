@@ -1,138 +1,213 @@
 "use client";
-import React, { useEffect } from "react";
-import anime from "animejs/lib/anime.js";
+
+import React from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
-export default function ExchangeReturnPage() {
-  useEffect(() => {
-    // Animation for page elements
-    anime.timeline()
-      .add({
-        targets: '.page-title',
-        opacity: [0, 1],
-        translateY: [30, 0],
-        easing: 'easeOutExpo',
-        duration: 1000,
-      })
-      .add({
-        targets: '.policy-section',
-        opacity: [0, 1],
-        translateY: [30, 0],
-        easing: 'easeOutExpo',
-        duration: 800,
-        delay: anime.stagger(200),
-      }, '-=500');
-  }, []);
-
+export default function ExchangeReturn() {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <Header isHome={false} />
       
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 pt-36 pb-10">
-        <h1 className="page-title text-4xl font-bold mb-12 text-center">Política de Troca e Devolução</h1>
-        
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          {/* Introduction */}
-          <section className="policy-section p-8 border-b border-gray-100">
-            <h2 className="text-2xl font-semibold mb-4">Nosso Compromisso</h2>
-            <p className="text-gray-700 mb-4">
-              Na Puca Coast, valorizamos a sua satisfação e confiança. Por isso, oferecemos uma política de trocas e devoluções transparente 
-              e justa, garantindo que você esteja completamente satisfeito com sua compra.
+      <main className="flex-1 px-4 py-8 pt-32">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Troca e Devolução
+            </h1>
+            <p className="text-lg text-gray-600">
+              Política transparente para sua tranquilidade
             </p>
-            <p className="text-gray-700">
-              Nossa política segue as normas do Código de Defesa do Consumidor e está descrita em detalhes abaixo.
-            </p>
-          </section>
-          
-          {/* Exchanges */}
-          <section className="policy-section p-8 border-b border-gray-100">
-            <h2 className="text-2xl font-semibold mb-4">Trocas</h2>
-            <h3 className="text-lg font-medium mt-6 mb-3">Prazo para Solicitação</h3>
-            <p className="text-gray-700 mb-4">
-              Você tem até <strong>30 dias corridos</strong>, contados a partir da data de entrega, para solicitar a troca de qualquer produto.
-            </p>
-            
-            <h3 className="text-lg font-medium mt-6 mb-3">Condições para Troca</h3>
-            <ul className="list-disc pl-5 text-gray-700 space-y-2">
-              <li>O produto deve estar em perfeitas condições, sem sinais de uso;</li>
-              <li>Deve estar acompanhado da etiqueta original;</li>
-              <li>Deve estar na embalagem original, sem danos;</li>
-              <li>Você deve apresentar a nota fiscal da compra.</li>
-            </ul>
-            
-            <h3 className="text-lg font-medium mt-6 mb-3">Como Solicitar Troca</h3>
-            <ol className="list-decimal pl-5 text-gray-700 space-y-2">
-              <li>Entre em contato conosco através do e-mail <a href="mailto:trocas@pucacoast.com" className="text-teal-600 hover:underline">trocas@pucacoast.com</a>;</li>
-              <li>Informe o número do pedido e o motivo da troca;</li>
-              <li>Nossa equipe fornecerá um código de autorização para devolução;</li>
-              <li>Envie o produto para o endereço informado no e-mail de autorização.</li>
-            </ol>
-          </section>
-          
-          {/* Returns */}
-          <section className="policy-section p-8 border-b border-gray-100">
-            <h2 className="text-2xl font-semibold mb-4">Devoluções</h2>
-            <h3 className="text-lg font-medium mt-6 mb-3">Prazo para Desistência (Direito de Arrependimento)</h3>
-            <p className="text-gray-700 mb-4">
-              Conforme o Código de Defesa do Consumidor, você tem até <strong>7 dias corridos</strong> após o recebimento do produto para exercer 
-              seu direito de arrependimento em compras realizadas pela internet.
-            </p>
-            
-            <h3 className="text-lg font-medium mt-6 mb-3">Condições para Devolução</h3>
-            <ul className="list-disc pl-5 text-gray-700 space-y-2">
-              <li>O produto deve estar em perfeitas condições, sem sinais de uso;</li>
-              <li>Deve estar acompanhado de todos os acessórios e brindes;</li>
-              <li>Deve estar na embalagem original, sem danos;</li>
-              <li>Você deve apresentar a nota fiscal da compra.</li>
-            </ul>
-            
-            <h3 className="text-lg font-medium mt-6 mb-3">Reembolso</h3>
-            <p className="text-gray-700 mb-4">
-              Após a aprovação da devolução, o reembolso será realizado em até 10 dias úteis, pelo mesmo meio de pagamento utilizado na compra:
-            </p>
-            <ul className="list-disc pl-5 text-gray-700 space-y-2">
-              <li>Cartão de crédito: o estorno será realizado na próxima fatura ou na seguinte;</li>
-              <li>PIX ou boleto: o valor será devolvido via transferência bancária;</li>
-              <li>O valor do frete de envio não será reembolsado, exceto em casos de produtos com defeito.</li>
-            </ul>
-          </section>
-          
-          {/* Defective Products */}
-          <section className="policy-section p-8 border-b border-gray-100">
-            <h2 className="text-2xl font-semibold mb-4">Produtos com Defeito</h2>
-            <p className="text-gray-700 mb-4">
-              Se você recebeu um produto com defeito, siga estas orientações:
-            </p>
-            <ol className="list-decimal pl-5 text-gray-700 space-y-2">
-              <li>Entre em contato em até 7 dias após o recebimento;</li>
-              <li>Envie fotos claras do defeito para <a href="mailto:trocas@pucacoast.com" className="text-teal-600 hover:underline">trocas@pucacoast.com</a>;</li>
-              <li>Após análise, forneceremos as instruções para devolução;</li>
-              <li>Você pode optar por troca, reparo ou reembolso integral (incluindo frete).</li>
-            </ol>
-          </section>
-          
-          {/* Customer Service */}
-          <section className="policy-section p-8">
-            <h2 className="text-2xl font-semibold mb-4">Atendimento ao Cliente</h2>
-            <p className="text-gray-700 mb-6">
-              Para dúvidas adicionais sobre nossa política de trocas e devoluções, entre em contato com nossa equipe:
-            </p>
-            <div className="bg-gray-50 p-6 rounded-md flex flex-col sm:flex-row justify-between items-center">
-              <div>
-                <p className="font-medium">E-mail:</p>
-                <a href="mailto:contato@pucacoast.com" className="text-teal-600 hover:underline">contato@pucacoast.com</a>
-              </div>
-              <div className="mt-4 sm:mt-0">
-                <p className="font-medium">Telefone:</p>
-                <p className="text-gray-700">(71) 99999-9999</p>
-              </div>
-              <div className="mt-4 sm:mt-0">
-                <p className="font-medium">Horário de Atendimento:</p>
-                <p className="text-gray-700">Seg-Sex: 9h às 18h</p>
-              </div>
+          </div>
+
+          <div className="bg-white p-8 rounded-lg shadow-lg">
+            <div className="prose prose-lg max-w-none">
+              <section className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Política de Troca e Devolução
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  Na PUCA Coast, queremos que você esteja 100% satisfeito com sua compra. 
+                  Por isso, oferecemos uma política de troca e devolução simples e transparente.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Prazo para Troca/Devolução
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  Você tem <strong>30 dias corridos</strong> a partir da data de recebimento 
+                  do produto para solicitar troca ou devolução.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Condições para Troca/Devolução
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-green-50 p-6 rounded-lg border border-green-200">
+                    <h3 className="text-lg font-semibold text-green-800 mb-3">
+                      ✅ Produto em Condições
+                    </h3>
+                    <ul className="text-green-700 space-y-2">
+                      <li>• Produto sem uso</li>
+                      <li>• Embalagem original intacta</li>
+                      <li>• Etiquetas e lacres preservados</li>
+                      <li>• Sem manchas ou odores</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-red-50 p-6 rounded-lg border border-red-200">
+                    <h3 className="text-lg font-semibold text-red-800 mb-3">
+                      ❌ Produto Não Aceito
+                    </h3>
+                    <ul className="text-red-700 space-y-2">
+                      <li>• Produto usado ou lavado</li>
+                      <li>• Embalagem danificada</li>
+                      <li>• Etiquetas removidas</li>
+                      <li>• Com manchas ou odores</li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Como Solicitar Troca/Devolução
+                </h2>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      1
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Entre em Contato</h3>
+                      <p className="text-gray-600">
+                        Envie um email para <strong>trocas@pucacoast.com.br</strong> com o número do pedido 
+                        e motivo da troca/devolução.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      2
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Aguarde Aprovação</h3>
+                      <p className="text-gray-600">
+                        Nossa equipe analisará sua solicitação e entrará em contato em até 48 horas.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      3
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Envie o Produto</h3>
+                      <p className="text-gray-600">
+                        Após aprovação, você receberá instruções para envio do produto.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      4
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Processamento</h3>
+                      <p className="text-gray-600">
+                        Após recebermos o produto, processaremos sua troca ou devolução em até 5 dias úteis.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Opções de Troca/Devolução
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="border border-gray-200 p-6 rounded-lg">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                      🔄 Troca
+                    </h3>
+                    <ul className="text-gray-600 space-y-2">
+                      <li>• Mesmo produto em outro tamanho</li>
+                      <li>• Outro produto do mesmo valor</li>
+                      <li>• Produto de valor superior (com complemento)</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="border border-gray-200 p-6 rounded-lg">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                      💰 Devolução
+                    </h3>
+                    <ul className="text-gray-600 space-y-2">
+                      <li>• Reembolso integral</li>
+                      <li>• Crédito na loja</li>
+                      <li>• Estorno no método de pagamento original</li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Custos de Envio
+                </h2>
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <p className="text-gray-600 mb-4">
+                    <strong>Produto com Defeito:</strong> Frete por nossa conta
+                  </p>
+                  <p className="text-gray-600 mb-4">
+                    <strong>Arrependimento:</strong> Frete por conta do cliente
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Produto Errado:</strong> Frete por nossa conta
+                  </p>
+                </div>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Produtos Especiais
+                </h2>
+                <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
+                  <h3 className="text-lg font-semibold text-yellow-800 mb-3">
+                    ⚠️ Produtos Personalizados
+                  </h3>
+                  <p className="text-yellow-700">
+                    Produtos personalizados ou feitos sob medida não podem ser trocados ou devolvidos, 
+                    exceto em caso de defeito de fabricação.
+                  </p>
+                </div>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Contato
+                </h2>
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <p className="text-gray-600 mb-2">
+                    <strong>Email:</strong> trocas@pucacoast.com.br
+                  </p>
+                  <p className="text-gray-600 mb-2">
+                    <strong>Telefone:</strong> (71) 99125-8688
+                  </p>
+                  <p className="text-gray-600">
+                    <strong>Horário:</strong> Segunda a Sexta, 9h às 18h
+                  </p>
+                </div>
+              </section>
             </div>
-          </section>
+          </div>
         </div>
       </main>
 

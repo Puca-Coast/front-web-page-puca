@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import { useInView } from "react-intersection-observer";
@@ -115,43 +114,27 @@ const OptimizedImage = ({ photo, index, isPriority }: {
   index: number; 
   isPriority: boolean;
 }) => {
-  const [loaded, setLoaded] = useState(false);
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.1,
     rootMargin: "100px",
   });
-  
-  const handleLoad = useCallback(() => {
-    setLoaded(true);
-  }, []);
 
   // Otimizar tamanho da imagem baseado no dispositivo
-  const sizes = useMemo(() => {
-    return "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw";
-  }, []);
+  const sizes = useMemo(() => "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw", []);
 
   return (
-    <div 
-      ref={ref} 
-      className={`relative w-full h-full overflow-hidden transition-opacity duration-500 ${
-        loaded ? 'opacity-100' : 'opacity-0'
-      }`}
-    >
+    <div ref={ref} className="relative w-full h-full overflow-hidden">
       {(inView || isPriority) && (
         <SimpleLookbookImage
           src={photo.url}
           alt={photo.description || `Lookbook ${index + 1}`}
-          width={1920}
+          width={1200}
           height={1080}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-center"
           priority={isPriority}
           sizes={sizes}
         />
-      )}
-      
-      {!loaded && (inView || isPriority) && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
       )}
     </div>
   );

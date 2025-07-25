@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useRouter } from "next/navigation";
-import anime from "animejs/lib/anime.js";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,28 +20,35 @@ export default function Login() {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   const router = useRouter();
-  const formRef = useRef<HTMLDivElement | null>(null);
   const [mostrarSenha, setMostrarSenha] = useState(false);
-  const { login, user } = useAuth();
+  const { login, user, authLoading } = useAuth();
 
   // Redirecionar se já está logado
   useEffect(() => {
-    if (user) {
-      router.push("/");
+    console.log('🔍 Login page - Estado atual:', { user, authLoading });
+    
+    // Só fazer redirecionamento quando a autenticação terminar de carregar
+    if (!authLoading && user) {
+      console.log('🔄 Usuário já logado, redirecionando...', user);
+      
+      // Verificar se há um parâmetro de redirecionamento na URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get('redirectTo');
+      
+      if (redirectTo) {
+        console.log('🔄 Redirecionando para:', redirectTo);
+        router.push(redirectTo);
+      } else {
+        // Redirecionamento padrão para home
+        console.log('🔄 Redirecionando para home (padrão)');
+        router.push("/?skipIntro=true");
+      }
+    } else if (!authLoading && !user) {
+      console.log('🔍 Usuário não logado, permanecendo na página de login');
+    } else {
+      console.log('⏳ Login page - Aguardando verificação de autenticação...');
     }
-  }, [user, router]);
-
-  useEffect(() => {
-    if (formRef.current) {
-      anime({
-        targets: formRef.current,
-        opacity: [0, 1],
-        translateY: [-50, 0],
-        easing: "easeOutExpo",
-        duration: 1000,
-      });
-    }
-  }, []);
+  }, [user, authLoading]); // Removido router das dependências
 
   // Função para validar os campos do formulário
   const validarFormulario = () => {
@@ -79,14 +86,10 @@ export default function Login() {
       const success = await login(email, senha);
       
       if (success) {
-        toast.success("Login realizado com sucesso!");
+        // Limpar formulário
         setEmail("");
         setSenha("");
-        
-        // Pequeno delay para mostrar o toast antes de redirecionar
-        setTimeout(() => {
-          router.push("/");
-        }, 1500);
+        // O redirecionamento agora é feito no AuthContext
       }
     } catch (error) {
       console.error("Erro ao realizar login:", error);
@@ -137,9 +140,14 @@ export default function Login() {
 
       {/* CORRIGIDO: Container com scroll permitido */}
       <div className="min-h-screen flex items-center justify-center px-4 pt-32 pb-16 relative z-10">
-        <div
-          ref={formRef}
+        <motion.div
           className="flex flex-col items-center w-full max-w-md p-8 rounded-lg elegant-blur-bg shadow-xl"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ 
+            duration: 0.8, 
+            ease: [0.25, 0.46, 0.45, 0.94] 
+          }}
         >
           <Image
             src="/assets/Logo2.png"
@@ -305,7 +313,7 @@ export default function Login() {
               </button>
             </p>
           )}
-        </div>
+        </motion.div>
       </div>
 
       <Footer isHome={false} />

@@ -20,8 +20,8 @@ import {
 interface SimpleOptimizedImageProps {
   src: string;
   alt: string;
-  width: number;
-  height: number;
+  width: number | string;
+  height: number | string;
   className?: string;
   fallbackSrc?: string;
   enableFallback?: boolean;
@@ -50,8 +50,8 @@ export const SimpleOptimizedImage: React.FC<SimpleOptimizedImageProps> = ({
   // Otimizar URL se for do Cloudinary
   const optimizedSrc = isCloudinaryImage(src) 
     ? optimizeCloudinaryImage(src, {
-        width,
-        height,
+        width: typeof width === 'string' ? undefined : width,
+        height: typeof height === 'string' ? undefined : height,
         quality,
         format: 'auto',
         crop: objectFit === 'cover' ? 'fill' : 'limit',
@@ -75,7 +75,7 @@ export const SimpleOptimizedImage: React.FC<SimpleOptimizedImageProps> = ({
     return (
       <div 
         className={`relative bg-gray-100 flex items-center justify-center ${className}`} 
-        style={{ width, height }}
+        style={typeof width === 'string' || typeof height === 'string' ? {} : { width, height }}
       >
         <img
           src={fallbackSrc}
@@ -90,7 +90,10 @@ export const SimpleOptimizedImage: React.FC<SimpleOptimizedImageProps> = ({
   // Usar Next/Image com unoptimized para todas as imagens
   // já que configuramos unoptimized: true no next.config.mjs
   return (
-    <div className={`relative ${className}`} style={{ width, height }}>
+    <div 
+      className={`relative ${className}`} 
+      style={typeof width === 'string' || typeof height === 'string' ? {} : { width, height }}
+    >
       {isLoading && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
           <div className="w-8 h-8 bg-gray-300 rounded-full animate-pulse"></div>
@@ -99,9 +102,9 @@ export const SimpleOptimizedImage: React.FC<SimpleOptimizedImageProps> = ({
       <Image
         src={optimizedSrc}
         alt={alt}
-        width={width}
-        height={height}
-        className={`${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+        width={typeof width === 'string' ? 0 : width}
+        height={typeof height === 'string' ? 0 : height}
+        className={`${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300 w-full h-auto`}
         style={{ objectFit }}
         onLoadingComplete={(result) => {
           if (result.naturalWidth === 0) {

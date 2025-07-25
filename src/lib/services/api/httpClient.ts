@@ -6,7 +6,8 @@
  */
 
 import { toast } from 'react-toastify';
-import { getCookie } from '../../utils/cookies';
+import { getCookie, clearAuthCookies } from '../../utils/cookies';
+
 
 /**
  * HTTP Client para comunicação com API
@@ -14,15 +15,16 @@ import { getCookie } from '../../utils/cookies';
 
 // Configuração da API
 const getApiBaseUrl = (): string => {
-  // Usar a variável de ambiente ou fallback para a URL da API do Vercel
-  return typeof window !== 'undefined' && (window as any).process?.env?.NEXT_PUBLIC_API_BASE_URL || 
-         'https://puca-api.vercel.app';
+  // Usar a variável de ambiente ou fallback para a URL da API local
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+  console.log('🔧 URL da API configurada:', url);
+  return url;
 };
 
 const API_BASE_URL = getApiBaseUrl();
 
 // Configuração para retry automático
-const RETRY_ATTEMPTS = 3;
+const RETRY_ATTEMPTS = 1; // Reduzido de 3 para 1 para evitar múltiplas tentativas
 const RETRY_DELAY = 1000; // 1 segundo
 
 // Função para delay entre tentativas
@@ -86,10 +88,8 @@ const handleHttpError = async (response: Response): Promise<Response> => {
     // Tratamento específico para diferentes códigos de erro
     switch (response.status) {
       case 401:
-        toast.error('Sessão expirada. Faça login novamente.');
-        // Redirecionar para login ou limpar token
-        document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        window.location.href = '/login';
+        // Não redirecionar automaticamente - deixar o componente decidir
+        console.log('🔒 Token inválido ou expirado');
         break;
       case 403:
         toast.error('Acesso negado.');

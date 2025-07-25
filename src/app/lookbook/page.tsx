@@ -10,8 +10,8 @@ import { SimpleLookbookImage } from "@/components/ui/OptimizedImage/SimpleOptimi
 interface LookbookPhotoItem {
   id: string;
   src: string;
-  width: number;
-  height: number;
+  width: number | string;
+  height: number | string;
   description: string;
 }
 
@@ -31,8 +31,8 @@ export default function LookbookPage() {
     return {
       id: photo._id,
       src: photo.url,
-      width: 400, // Largura padrão para o masonry
-      height: 600, // Altura padrão para o masonry
+      width: 'auto', // Largura automática para o masonry se adaptar
+      height: 'auto', // Altura automática para o masonry se adaptar
       description: photo.description || 'Lookbook PUCA',
     };
   }, []);
@@ -70,7 +70,12 @@ export default function LookbookPage() {
         if (currentPage === 1) {
           setPhotos(newPhotos);
         } else {
-          setPhotos((prev) => [...prev, ...newPhotos]);
+          setPhotos((prev) => {
+            // Filtrar fotos duplicadas baseado no ID
+            const existingIds = new Set(prev.map(p => p.id));
+            const uniqueNewPhotos = newPhotos.filter(photo => !existingIds.has(photo.id));
+            return [...prev, ...uniqueNewPhotos];
+          });
         }
         
         // Atualizar controles de paginação
@@ -152,7 +157,7 @@ export default function LookbookPage() {
         <div className="masonry-grid pt-6">
           {photos.map((photo, index) => (
             <OptimizedPhotoCard 
-              key={photo.id} 
+              key={`${photo.id}-${index}`} 
               photo={photo} 
               index={index} 
               isPriority={index < 3}
@@ -211,8 +216,8 @@ const OptimizedPhotoCard: React.FC<{
         <SimpleLookbookImage
           src={photo.src}
           alt={photo.description}
-          width={photo.width}
-          height={photo.height}
+          width={'auto'}
+          height={'auto'}
           className={`
             w-full h-auto object-cover transition-all duration-500 ease-out
             ${isHovered ? 'scale-105' : 'scale-100'}

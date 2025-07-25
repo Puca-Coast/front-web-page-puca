@@ -83,8 +83,8 @@ export const isTokenExpired = (token: string): boolean => {
  * Configura cookies de autenticação
  */
 export const setAuthCookies = (token: string, role: string) => {
-  // Guarda o token em um cookie seguro
-  setAuthCookie('token', token, {
+  // Guarda o token em um cookie seguro (nome que o httpClient espera)
+  setAuthCookie('auth_token', token, {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     maxAge: 86400, // 1 dia em segundos
@@ -102,6 +102,6 @@ export const setAuthCookies = (token: string, role: string) => {
  * Remove cookies de autenticação (logout)
  */
 export const clearAuthCookies = () => {
-  removeCookie('token');
+  removeCookie('auth_token');
   removeCookie('role');
 }; 

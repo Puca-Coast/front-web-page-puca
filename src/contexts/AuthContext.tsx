@@ -23,6 +23,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
+  authLoading: boolean; // Adicionado para compatibilidade
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   checkAuth: () => Promise<void>;
@@ -53,25 +54,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       const token = getCookie('auth_token');
       
-      if (!token || isTokenExpired(token)) {
+      console.log('🔍 Verificando autenticação...', { token: !!token });
+      
+      if (!token) {
+        console.log('❌ Token não encontrado');
         clearAuthCookies();
         setUser(null);
         setIsAuthenticated(false);
         return;
       }
 
+      if (isTokenExpired(token)) {
+        console.log('❌ Token expirado');
+        clearAuthCookies();
+        setUser(null);
+        setIsAuthenticated(false);
+        return;
+      }
+
+      console.log('🔍 Token válido, verificando perfil...');
       const response = await authService.getProfile();
+      console.log('📡 Resposta do profile:', response);
       
       if (response.success && response.user) {
+        console.log('✅ Usuário autenticado:', response.user);
         setUser(response.user);
         setIsAuthenticated(true);
       } else {
+        console.log('❌ Falha na autenticação - resposta inválida');
         clearAuthCookies();
         setUser(null);
         setIsAuthenticated(false);
       }
     } catch (error) {
-      console.error('Erro ao verificar autenticação:', error);
+      console.error('❌ Erro ao verificar autenticação:', error);
       clearAuthCookies();
       setUser(null);
       setIsAuthenticated(false);
@@ -85,10 +101,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login({ email, password });
       
       if (response.success && response.token && response.user) {
+        // Configurar cookies primeiro
         setAuthCookies(response.token, response.user.isAdmin ? 'admin' : 'user');
+        
+        // Atualizar estado
         setUser(response.user);
         setIsAuthenticated(true);
+        
+        // Mostrar toast de sucesso
         toast.success('Login realizado com sucesso!');
+        
+        // Redirecionar para home com skipIntro
+        setTimeout(() => {
+          router.push('/?skipIntro=true');
+        }, 1000);
+        
         return true;
       } else {
         toast.error(response.message || 'Erro ao fazer login');
@@ -118,6 +145,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated,
     isAdmin: user?.isAdmin || false,
     isLoading,
+    authLoading: isLoading, // Alias para compatibilidade
     login,
     logout,
     checkAuth,
