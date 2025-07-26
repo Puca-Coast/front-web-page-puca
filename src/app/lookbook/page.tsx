@@ -25,6 +25,7 @@ export default function LookbookPage() {
 
   const observerRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
+  const currentPageRef = useRef(1);
 
   // Mapear foto da API para o formato local
   const mapPhotoToItem = useCallback((photo: LookbookPhoto): LookbookPhotoItem => {
@@ -39,23 +40,23 @@ export default function LookbookPage() {
 
   // Função para buscar as fotos usando o serviço
   const fetchPhotos = useCallback(async () => {
-    if (isLoading || !hasMore || controllerRef.current?.signal.aborted) return;
+    if (isLoading || !hasMore) return;
     setIsLoading(true);
     setError(null);
 
     try {
-      // Cancelar requisição anterior se existir
-      if (controllerRef.current) {
+      // Cancelar requisição anterior apenas se ainda existir e não for abortada
+      if (controllerRef.current && !controllerRef.current.signal.aborted) {
         controllerRef.current.abort();
       }
       
       // Criar novo controller para esta requisição
       controllerRef.current = new AbortController();
 
-      console.log(`🔍 Buscando fotos - Página: ${currentPage}, Limite: 10`);
+      console.log(`🔍 Buscando fotos - Página: ${currentPageRef.current}, Limite: 10`);
       
       // Usar o serviço de lookbook
-      const response = await lookbookService.getPhotos(currentPage, 10, 'primavera2024');
+      const response = await lookbookService.getPhotos(currentPageRef.current, 10, 'primavera2024');
       
       console.log('📸 Resposta da API:', {
         success: response.success,
@@ -67,7 +68,7 @@ export default function LookbookPage() {
         const newPhotos = response.data.map(mapPhotoToItem);
         
         // Se for a primeira página, substituir; senão, adicionar
-        if (currentPage === 1) {
+        if (currentPageRef.current === 1) {
           setPhotos(newPhotos);
         } else {
           setPhotos((prev) => {
@@ -78,8 +79,9 @@ export default function LookbookPage() {
           });
         }
         
-        // Atualizar controles de paginação
-        setCurrentPage((prev) => prev + 1);
+        // Atualizar controles de paginação - incrementar ref primeiro, depois state
+        currentPageRef.current += 1;
+        setCurrentPage(currentPageRef.current);
         setHasMore(response.pagination.currentPage < response.pagination.totalPages);
       } else {
         console.error("❌ Erro na resposta da API:", response);
@@ -96,7 +98,7 @@ export default function LookbookPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, isLoading, hasMore, mapPhotoToItem]);
+  }, [isLoading, hasMore, mapPhotoToItem]);
 
   // Intersection observer para infinite scroll
   const onIntersect = useCallback(
@@ -112,7 +114,7 @@ export default function LookbookPage() {
   useEffect(() => {
     const observer = new IntersectionObserver(onIntersect, {
       root: null,
-      rootMargin: "200px",
+      rootMargin: "800px", // Trigger much earlier - 800px before user reaches end
       threshold: 0.1,
     });
 
@@ -165,7 +167,7 @@ export default function LookbookPage() {
           ))}
 
           {isLoading &&
-            Array.from({ length: 6 }).map((_, idx) => (
+            Array.from({ length: 3 }).map((_, idx) => (
               <SkeletonCard key={`skeleton-${idx}`} />
             ))}
         </div>
@@ -178,6 +180,7 @@ export default function LookbookPage() {
                 onClick={() => {
                   setError(null);
                   setCurrentPage(1);
+                  currentPageRef.current = 1;
                   setHasMore(true);
                   setIsInitialized(false);
                 }}
@@ -205,10 +208,24 @@ const OptimizedPhotoCard: React.FC<{
   key?: string | number;
 }> = ({ photo, index, isPriority }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Smooth reveal animation for new images
+  useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), index * 50); // Staggered animation
+    return () => clearTimeout(timer);
+  }, [index]);
 
   return (
     <div 
-      className="masonry-item group relative overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 bg-white/90 backdrop-blur-sm rounded-lg"
+      className={`
+        masonry-item group relative overflow-hidden shadow-md hover:shadow-xl 
+        transition-all duration-700 bg-white/90 backdrop-blur-sm rounded-lg
+        ${isVisible 
+          ? 'opacity-100 transform translate-y-0' 
+          : 'opacity-0 transform translate-y-4'
+        }
+      `}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -238,12 +255,17 @@ const OptimizedPhotoCard: React.FC<{
   );
 };
 
-// Skeleton loading otimizado
+// Skeleton loading otimizado - muito sutil para pré-carregamento
 function SkeletonCard() {
   return (
-    <div className="masonry-item">
-      <div className="bg-gray-200 animate-pulse rounded-lg" style={{ height: '400px' }}>
-        <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg"></div>
+    <div className="masonry-item opacity-40">
+      <div 
+        className="bg-gray-100 animate-pulse rounded-lg border border-gray-200/50" 
+        style={{ height: '300px' }}
+      >
+        <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-150 rounded-lg flex items-center justify-center">
+          <div className="w-6 h-6 bg-gray-300 rounded-full animate-pulse"></div>
+        </div>
       </div>
     </div>
   );

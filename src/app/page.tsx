@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import Home from "@/components/features/home/Home";
+import HomeWithParams from "@/components/features/home/HomeWithParams";
 
 export default function HomePage() {
-  return <Home showIntro={true} />;
+  return <HomeWithParams />;
 } 

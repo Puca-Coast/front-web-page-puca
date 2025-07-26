@@ -3,7 +3,7 @@
 import { FC } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import CarouselHome from "@/components/features/home/carouselHome";
+import CarouselHome from "@/components/features/home/CarouselHome";
 import { MainContentProps } from "@/types";
 
 const MainContent: FC<MainContentProps> = ({ isHome }) => {
