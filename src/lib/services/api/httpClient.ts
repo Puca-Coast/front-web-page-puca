@@ -17,7 +17,6 @@ import { getCookie, clearAuthCookies } from '../../utils/cookies';
 const getApiBaseUrl = (): string => {
   // Usar a variável de ambiente ou fallback para a URL da API local
   const url = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
-  console.log('🔧 URL da API configurada:', url);
   return url;
 };
 
@@ -41,7 +40,6 @@ const withRetry = async <T>(
     return await fn();
   } catch (error) {
     if (attempts > 1) {
-      console.log(`Tentativa falhada, tentando novamente em ${delayMs}ms...`);
       await delay(delayMs);
       return withRetry(fn, attempts - 1, delayMs * 1.5); // Backoff exponencial
     }
@@ -89,7 +87,6 @@ const handleHttpError = async (response: Response): Promise<Response> => {
     switch (response.status) {
       case 401:
         // Não redirecionar automaticamente - deixar o componente decidir
-        console.log('🔒 Token inválido ou expirado');
         break;
       case 403:
         toast.error('Acesso negado.');
@@ -250,10 +247,5 @@ export const httpClient = {
     }
   },
 };
-
-// Configuração para debug
-if (typeof window !== 'undefined') {
-  console.log('🔧 HTTP Client configurado para:', API_BASE_URL);
-}
 
 export default httpClient; 

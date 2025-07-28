@@ -218,7 +218,7 @@ export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
           <SwiperSlide
             key={`${photo._id}-${Math.floor(index / photos.length)}`}
             className="marquee-item"
-            style={{ width: "80%", height: "100%" }}
+            style={{ width: "auto", height: "100%" }}
           >
             <OptimizedImage 
               photo={photo} 

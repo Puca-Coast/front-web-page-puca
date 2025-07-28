@@ -5,26 +5,32 @@ import PageLayout from "@/layouts/PageLayout";
 import "@/styles/lookbookStyles.css";
 import { lookbookService } from "@/lib/services/api/lookbookService";
 
+interface LookbookPhoto {
+  _id: string;
+  url: string;
+  description?: string;
+}
+
 export default function LookbookPage() {
-  const [photos, setPhotos] = useState([]);
+  const [photos, setPhotos] = useState<LookbookPhoto[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef(null);
   const loadingRef = useRef(false);
 
   // Fetch photos
-  const loadPhotos = async (pageNum) => {
+  const loadPhotos = async (pageNum: number | undefined) => {
     if (loadingRef.current) return;
     loadingRef.current = true;
     
     try {
       const response = await lookbookService.getPhotos(pageNum, 20, 'primavera2024');
       if (response.success && response.data.length > 0) {
-        setPhotos(prev => {
+        setPhotos((prev) => {
           if (pageNum === 1) return response.data;
           
           // Filter out duplicates
-          const existingIds = new Set(prev.map(p => p._id));
+          const existingIds = new Set(prev.map((p: any) => p._id));
           const newPhotos = response.data.filter(photo => !existingIds.has(photo._id));
           return [...prev, ...newPhotos];
         });

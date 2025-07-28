@@ -18,7 +18,7 @@ export default function ProductPageClient({ id }: ProductPageClientProps) {
       <main className="flex-grow">
         <ProductDetail productId={id} />
       </main>
-      <Footer isHome={false} />
+      <Footer />
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );

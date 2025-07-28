@@ -379,7 +379,7 @@ const CheckoutPage: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Form */}
             <div className="lg:w-2/3">
-              <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-lg p-6">
+              <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => handleSubmit(e)} className="bg-white rounded-lg shadow-lg p-6">
                 {/* Step 1: Address */}
                 {currentStep === 1 && (
                   <div>

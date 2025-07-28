@@ -72,46 +72,35 @@ export default function AdminPanel() {
   const [editingProduct, setEditingProduct] = useState<ProductData | null>(null);
 
   useEffect(() => {
-    console.log('🔍 Admin page - Estado atual:', { user, authLoading, isAdmin: user?.isAdmin });
-    console.log('🔍 Admin page - Token no cookie:', !!getCookie('auth_token'));
     
     // Só fazer verificações quando a autenticação terminar de carregar
     if (!authLoading) {
-      console.log('🔍 Admin page - Autenticação carregada, verificando permissões...');
       
       if (!user) {
-        console.log('❌ Usuário não autenticado, redirecionando para login');
         toast.error('Acesso negado. Faça login para continuar.');
         router.push('/login?redirectTo=/admin');
         return;
       }
       
       if (!user.isAdmin) {
-        console.log('❌ Usuário não é admin, redirecionando para home');
         toast.error('Acesso negado. Área restrita para administradores.');
         router.push('/');
         return;
       }
       
-      console.log('✅ Usuário admin válido, buscando dados...');
       // Se chegou aqui, é admin válido - buscar dados
       fetchAdminData();
     } else {
-      console.log('⏳ Admin page - Aguardando verificação de autenticação...');
     }
   }, [user, authLoading]); // Removido router das dependências para evitar loops
 
   const fetchAdminData = async () => {
     try {
-      console.log('🔄 Iniciando busca de dados administrativos...');
       const token = getCookie('auth_token');
-      console.log('🔑 Token disponível:', !!token);
       
       const apiUrl = typeof window !== 'undefined' ? 
         window.location.origin.includes('localhost') ? 'http://localhost:3000' : 'https://puca-api.vercel.app' :
         'http://localhost:3000';
-
-      console.log('🌐 URL da API:', apiUrl);
 
       // Buscar estatísticas
       const statsResponse = await fetch(`${apiUrl}/api/orders/admin/stats`, {
@@ -119,8 +108,6 @@ export default function AdminPanel() {
           'Authorization': `Bearer ${token}`
         }
       });
-
-      console.log('📊 Status da resposta de stats:', statsResponse.status);
 
       if (statsResponse.ok) {
         const statsResult = await statsResponse.json();
@@ -134,8 +121,6 @@ export default function AdminPanel() {
         }
       });
 
-      console.log('📦 Status da resposta de pedidos:', ordersResponse.status);
-
       if (ordersResponse.ok) {
         const ordersResult = await ordersResponse.json();
         setOrders(ordersResult.data);
@@ -148,8 +133,6 @@ export default function AdminPanel() {
         }
       });
 
-      console.log('👥 Status da resposta de usuários:', usersResponse.status);
-
       if (usersResponse.ok) {
         const usersResult = await usersResponse.json();
         setUsers(usersResult.data);
@@ -161,8 +144,6 @@ export default function AdminPanel() {
           'Authorization': `Bearer ${token}`
         }
       });
-
-      console.log('🛍️ Status da resposta de produtos:', productsResponse.status);
 
       if (productsResponse.ok) {
         const productsResult = await productsResponse.json();
@@ -184,14 +165,10 @@ export default function AdminPanel() {
         }
       });
 
-      console.log('📸 Status da resposta do lookbook:', lookbookRes.status);
-
       if (lookbookRes.ok) {
         const lookbookData = await lookbookRes.json();
         setLookbookPhotos(lookbookData.data || []);
       }
-
-      console.log('✅ Dados administrativos carregados com sucesso');
 
     } catch (error) {
       console.error('❌ Erro ao buscar dados administrativos:', error);

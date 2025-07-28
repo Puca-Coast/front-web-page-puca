@@ -34,16 +34,6 @@ export default function SmartFooter({
 }: SmartFooterProps) {
   const { isNearBottom, scrollProgress } = useScrollProgress(threshold);
   
-  // Debug logging to track scroll behavior
-  console.log("SmartFooter Debug:", {
-    scrollProgress: Math.round(scrollProgress * 100) / 100,
-    isNearBottom,
-    threshold,
-    shouldShow: isNearBottom
-  });
-  
-  // For homepage, we want to show the footer with smart behavior
-  // For other pages, maintain the smart behavior too
   const shouldShowFooter = isNearBottom;
 
   return (
@@ -60,8 +50,6 @@ export default function SmartFooter({
           className={`smart-footer-container ${className}`}
         >
           <Footer 
-            isHome={false} // CRITICAL: Always render footer visibly when smart footer shows it
-            {...footerProps}
           />
         </motion.div>
       )}

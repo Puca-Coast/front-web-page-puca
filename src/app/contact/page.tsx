@@ -12,8 +12,6 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implementar envio do formulário
-    console.log("Formulário enviado:", formData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -89,7 +87,7 @@ export default function Contact() {
                 Envie uma Mensagem
               </h2>
               
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => handleSubmit(e)} className="space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                     Nome

@@ -22,7 +22,7 @@ export default function Login() {
     }
   }, [user, authLoading, router]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     
     if (!email || !senha) {

@@ -51,3 +51,6 @@ package-lock.json
 # sitemap
 /public/robots.txt
 /public/sitemap*.xml
+
+# Local Netlify folder
+.netlify

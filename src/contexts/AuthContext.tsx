@@ -54,10 +54,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       const token = getCookie('auth_token');
       
-      console.log('🔍 Verificando autenticação...', { token: !!token });
-      
       if (!token) {
-        console.log('❌ Token não encontrado');
+
         clearAuthCookies();
         setUser(null);
         setIsAuthenticated(false);
@@ -65,29 +63,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       if (isTokenExpired(token)) {
-        console.log('❌ Token expirado');
+
         clearAuthCookies();
         setUser(null);
         setIsAuthenticated(false);
         return;
       }
 
-      console.log('🔍 Token válido, verificando perfil...');
       const response = await authService.getProfile();
-      console.log('📡 Resposta do profile:', response);
       
       if (response.success && response.user) {
-        console.log('✅ Usuário autenticado:', response.user);
         setUser(response.user);
         setIsAuthenticated(true);
       } else {
-        console.log('❌ Falha na autenticação - resposta inválida');
+
         clearAuthCookies();
         setUser(null);
         setIsAuthenticated(false);
       }
     } catch (error) {
-      console.error('❌ Erro ao verificar autenticação:', error);
       clearAuthCookies();
       setUser(null);
       setIsAuthenticated(false);

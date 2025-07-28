@@ -31,7 +31,7 @@ export default function Intro({ onComplete }: IntroProps) {
             // 2. Pré-carregar pelo menos 3 imagens
             const preloadImages = async () => {
               try {
-                const imagePromises = data.data.slice(0, 3).map(photo => {
+                const imagePromises = data.data.slice(0, 3).map((photo: any) => {
                   return new Promise((resolve, reject) => {
                     const img = new window.Image();
                     img.src = photo.url;
@@ -41,7 +41,6 @@ export default function Intro({ onComplete }: IntroProps) {
                 });
                 
                 await Promise.all(imagePromises);
-                console.log("Primeiras 3 imagens pré-carregadas");
                 setImagesPreloaded(true);
               } catch (error) {
                 console.error("Erro ao pré-carregar imagens:", error);
@@ -53,12 +52,10 @@ export default function Intro({ onComplete }: IntroProps) {
             preloadImages();
           }
         } catch (error) {
-          console.error("Erro ao buscar fotos do carousel na Intro:", error);
           setImagesPreloaded(true); // Continuar mesmo com erro
         }
       } else {
         // Se já temos dados em cache, apenas marcar como carregado
-        console.log("Dados do carousel já em cache");
         setImagesPreloaded(true);
       }
     };

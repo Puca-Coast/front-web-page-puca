@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { PageLayout } from "@/layouts";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -108,7 +108,7 @@ export default function Shop() {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { 
       opacity: 0, 
       y: 60, 
