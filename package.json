@@ -46,6 +46,5 @@
     "@types/prop-types": "^15.7.14",
     "@types/react-input-mask": "^3.0.6",
     "@types/react-toastify": "^4.1.0"
-  },
-  "packageManager": "yarn@4.7.0+sha256.293632d8a095d8ea4786eb2c5798c83c37544abed17ed31186a3ec4549a07c06"
+  }
 }
