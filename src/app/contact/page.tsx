@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import { PageLayout } from "@/layouts";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -25,10 +24,8 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <Header isHome={false} />
-      
-      <main className="flex-1 px-4 py-8 pt-32">
+    <PageLayout background="gradient">
+      <main className="flex-1 px-4 py-8 pt-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -149,8 +146,6 @@ export default function Contact() {
           </div>
         </div>
       </main>
-
-      <Footer isHome={false} />
-    </div>
+    </PageLayout>
   );
 } 

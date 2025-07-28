@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import { PageLayout } from "@/layouts";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { productService, Product } from "@/lib/services/api/productService";
@@ -127,17 +126,11 @@ export default function Shop() {
   };
 
   return (
-    <>
-    <Header isHome={false} />
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-scroll" style={{
-      width: '100vw',
-      height: '100vh',
-    }}>
-      
-      <main className="puca-page-content z-10 w-full flex-1">
+    <PageLayout background="gradient" noPaddingTop={true}>
+      <main className="flex-1 w-full z-10">
         
         {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full mx-auto">
             {Array.from({ length: 9 }).map((_, idx) => (
               <div
                 key={`skeleton-${idx}`}
@@ -165,7 +158,6 @@ export default function Shop() {
           <motion.div 
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full mx-auto"
             variants={containerVariants}
-            initial="hidden"
             animate="visible"
           >
             {items.map((item, i) => (
@@ -177,7 +169,6 @@ export default function Shop() {
                 onMouseLeave={() => setHoverIdx(null)}
                 onClick={() => handleProductClick(item._id)}
                 whileHover={{ 
-                  scale: 1.02,
                   transition: { duration: 0.2 }
                 }}
               >
@@ -185,7 +176,7 @@ export default function Shop() {
                 <div className="relative">
                   
          
-                  <div className="relative w-full bg-white group aspect-[3/4] lg:aspect-auto lg:h-[calc(100vh-80px)]">
+                  <div className="relative w-full bg-white group aspect-[3/4] lg:aspect-auto lg:h-[calc(92vh)]">
                     
      
                     <Image
@@ -231,9 +222,6 @@ export default function Shop() {
           </motion.div>
         )}
       </main>
-    </div>
-    <Footer isHome={false} />
-
-    </>
+    </PageLayout>
   );
 }

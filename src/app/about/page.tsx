@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import { PageLayout } from "@/layouts";
 import Image from "next/image";
 
 export default function About() {
@@ -18,10 +17,8 @@ export default function About() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <Header isHome={false} />
-      
-      <main className="flex-1 px-4 py-8 pt-32">
+    <PageLayout background="gradient">
+      <main className="flex-1 px-4 py-8 pt-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col lg:flex-row items-center justify-center gap-12">
             {/* Seção da Imagem */}
@@ -56,8 +53,6 @@ export default function About() {
           </div>
         </div>
       </main>
-
-      <Footer isHome={false} />
-    </div>
+    </PageLayout>
   );
 }

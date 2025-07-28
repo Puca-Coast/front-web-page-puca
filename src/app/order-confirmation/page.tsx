@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import PageLayout from '@/components/layout/PageLayout';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -117,35 +116,35 @@ export default function OrderConfirmationPage() {
 
   if (error || !order) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header isHome={false} />
-        <main className="pt-32 pb-16">
-          <div className="max-w-2xl mx-auto px-4 text-center">
-            <div className="bg-white p-8 rounded-lg shadow-sm">
-              <div className="text-red-500 text-5xl mb-4">⚠</div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                {error || 'Pedido não encontrado'}
-              </h1>
-              <p className="text-gray-600 mb-6">
-                Não conseguimos encontrar os detalhes do seu pedido.
-              </p>
-              <Link
-                href="/shop"
-                className="inline-block bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition"
-              >
-                Voltar às Compras
-              </Link>
+      <PageLayout>
+        <div className="min-h-screen bg-gray-50">
+          <main className="pt-32 pb-16">
+            <div className="max-w-2xl mx-auto px-4 text-center">
+              <div className="bg-white p-8 rounded-lg shadow-sm">
+                <div className="text-red-500 text-5xl mb-4">⚠</div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                  {error || 'Pedido não encontrado'}
+                </h1>
+                <p className="text-gray-600 mb-6">
+                  Não conseguimos encontrar os detalhes do seu pedido.
+                </p>
+                <Link
+                  href="/shop"
+                  className="inline-block bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition"
+                >
+                  Voltar às Compras
+                </Link>
+              </div>
             </div>
-          </div>
-        </main>
-        <Footer isHome={false} />
-      </div>
+          </main>
+        </div>
+      </PageLayout>
     );
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <Header isHome={false} />
+    <PageLayout>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       
       <main className="pt-32 pb-16">
         <div className="max-w-4xl mx-auto px-4">
@@ -321,8 +320,7 @@ export default function OrderConfirmationPage() {
 
         </div>
       </main>
-      
-      <Footer isHome={false} />
-    </div>
+      </div>
+    </PageLayout>
   );
 } 

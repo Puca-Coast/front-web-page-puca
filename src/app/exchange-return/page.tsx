@@ -1,13 +1,12 @@
 "use client";
 
 import React from "react";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import PageLayout from "@/layouts/PageLayout";
 
 export default function ExchangeReturn() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <Header isHome={false} />
+    <PageLayout>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       
       <main className="flex-1 px-4 py-8 pt-32">
         <div className="max-w-4xl mx-auto">
@@ -210,8 +209,7 @@ export default function ExchangeReturn() {
           </div>
         </div>
       </main>
-
-      <Footer isHome={false} />
-    </div>
+      </div>
+    </PageLayout>
   );
 } 

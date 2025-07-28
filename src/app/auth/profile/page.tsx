@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import PageLayout from '@/layouts/PageLayout';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
@@ -159,8 +158,8 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <Header isHome={false} />
+    <PageLayout>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       
       <main className="puca-page-content">
         <div className="max-w-6xl mx-auto px-4">
@@ -491,8 +490,7 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
-
-      <Footer isHome={false} />
-    </div>
+      </div>
+    </PageLayout>
   );
 }

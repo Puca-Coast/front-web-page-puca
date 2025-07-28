@@ -1,16 +1,15 @@
 "use client";
 
 import { SimpleLookbookImage } from '@/components/ui/OptimizedImage/SimpleOptimizedImage';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import PageLayout from '@/components/layout/PageLayout';
 
 export default function TestPage() {
   // URL de teste do Cloudinary que estava falhando
   const testCloudinaryUrl = "https://res.cloudinary.com/dgsigv8cf/image/upload/v1729657211/lookbook/ona1zof0arevqunwrfpq.jpg";
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header isHome={false} />
+    <PageLayout>
+      <div className="min-h-screen bg-gray-50">
       
       <main className="max-w-4xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
@@ -157,8 +156,7 @@ export default function TestPage() {
           </a>
         </div>
       </main>
-
-      <Footer isHome={false} />
-    </div>
+      </div>
+    </PageLayout>
   );
 } 

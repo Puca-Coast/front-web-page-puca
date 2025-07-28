@@ -7,15 +7,10 @@ import Link from "next/link";
 import { ROUTES } from "@/config/environment";
 import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 
-export default function Footer(props) {
-  const { isHome = false } = props; // Padrão para false
-
+export default function Footer() {
   return (
     <footer
-      className={`z-40 bg-white shadow group transition duration-500 w-full border-t-2 border-black ${
-        isHome ? "mt-4 opacity-0" : "opacity-100"
-      }`}
-      style={{ display: isHome ? "none" : "flex" }}
+      className="z-10 bg-white shadow group transition duration-500 w-full border-t-2 border-black"
     >
       <div className="w-full mx-auto max-w-screen-xl p-4 md:py-6">
         {/* Main Footer Content */}

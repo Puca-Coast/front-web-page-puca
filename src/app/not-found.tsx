@@ -1,12 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import PageLayout from '@/layouts/PageLayout';
 
 export default function NotFound() {
   return (
-    <>
-      <Header isHome={false} />
+    <PageLayout>
       <div className="min-h-screen flex flex-col items-center justify-center p-5 text-center">
         <h1 className="text-4xl font-bold mb-4">404 - Página não encontrada</h1>
         <p className="text-lg mb-8">
@@ -19,7 +17,6 @@ export default function NotFound() {
           Voltar para Home
         </Link>
       </div>
-      <Footer isHome={false} />
-    </>
+    </PageLayout>
   );
 } 

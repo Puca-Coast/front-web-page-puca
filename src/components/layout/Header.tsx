@@ -43,10 +43,10 @@ export default function Header({ isHome }: { isHome: boolean }) {
     <>
       <div
         ref={headerRef}
-        className={`puca-header fixed top-0 left-0 right-0 flex items-center justify-between py-4 px-5 w-full z-30 transition-all duration-500 ease-in-out bg-white border-b-2 border-black ${
+        className={`puca-header fixed top-0 left-0 right-0 flex items-center justify-between py-4 px-5 w-full z-50 transition-all duration-500 ease-in-out bg-white border-b-2 border-black ${
           isVisible ? "opacity-100" : "opacity-0"
         }`}
-        style={{ display: isHome ? "none" : "flex" }}
+        style={{ display: isHome && !isVisible ? "none" : "flex" }}
       >
         <Link href="/?skipIntro=true">
           <img
