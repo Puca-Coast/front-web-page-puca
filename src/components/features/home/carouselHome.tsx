@@ -19,7 +19,6 @@ import "@/styles/carouselStyles.css";
 const CACHE_KEY = "carousel_photos_v2";
 const CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutos
 
-// Interface para cache
 interface CachedData {
   photos: LookbookPhoto[];
   timestamp: number;

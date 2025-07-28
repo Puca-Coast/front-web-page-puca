@@ -12,8 +12,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run postbuild` - Generate sitemap (runs automatically after build)
 
 ### Package Management
-- Uses `yarn@4.7.0` as package manager (configured in package.json)
-- `npm install` works but yarn is preferred for consistency
+- Uses npm as package manager (no yarn.lock present)
+- Standard npm commands: `npm install`, `npm run dev`, etc.
 
 ## Project Architecture
 
@@ -73,7 +73,7 @@ src/
 ### Configuration Files
 
 #### TypeScript
-- **Strict mode**: Disabled (`"strict": false`) but types are still enforced
+- **Strict mode**: Enabled (`"strict": true`) with full type checking
 - **Path aliases**: `@/*` maps to `./src/*`, `@/public/*` maps to `./public/*`
 - **Target**: ES2017 for broad browser compatibility
 
@@ -91,7 +91,7 @@ src/
 
 ### Development Workflow
 1. Always run linting after making changes: `npm run lint`
-2. TypeScript errors may exist but builds are allowed (temporary config)
+2. TypeScript errors block builds (strict mode enabled)
 3. Test locally on port 3001 to avoid conflicts
 
 ### Authentication Flow
@@ -100,19 +100,22 @@ src/
 - Admin routes require both authentication and admin role
 
 ### API Integration
-- Backend API URL configurable via environment variables
-- Default local API: `http://localhost:3000`
-- All API calls go through the centralized httpClient
-- Automatic error handling with toast notifications
+- Backend API URL configurable via `NEXT_PUBLIC_API_BASE_URL` environment variable
+- Default local API: `http://localhost:3000` (fallback in httpClient)
+- Default production API: `https://puca-api.vercel.app` (fallback in next.config.mjs)
+- All API calls go through the centralized httpClient at `src/lib/services/api/httpClient.ts`
+- Automatic retry logic with exponential backoff (1 retry, 1s delay)
+- Comprehensive error handling with toast notifications via react-toastify
 
 ### Known Issues
-- Some TypeScript errors exist but are not blocking builds
-- `react-toastify` dependency referenced in docs as pending
 - Backend "Forgot Password" endpoint not implemented yet
+- No test framework currently configured
+- Error boundaries not yet implemented (noted as future enhancement)
 
 ### Code Conventions
 - React 19 features are available (concurrent features, new hooks)
 - Functional components with hooks preferred
 - TypeScript interfaces defined in `src/types/`
 - CSS modules used alongside Tailwind for component-specific styles
-- Error boundaries not yet implemented (noted as future enhancement)
+- Route protection implemented via middleware.ts and AuthContext HOCs (`withAuth`, `withAdminAuth`)
+- Authentication state managed centrally via AuthContext with JWT cookie storage
