@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import PageLayout from '@/components/layout/PageLayout';
+import PageLayout from '@/layouts/PageLayout';
 import Image from 'next/image';
 import Link from 'next/link';
 

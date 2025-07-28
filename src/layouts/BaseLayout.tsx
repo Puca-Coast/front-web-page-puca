@@ -62,7 +62,7 @@ export default function BaseLayout({
       
       {includeFooter && (
         <div style={{ zIndex: LAYOUT_TOKENS.footer.zIndex }}>
-          <Footer isHome={footerProps?.isHome ?? false} {...footerProps} />
+          <Footer />
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { SimpleLookbookImage } from '@/components/ui/OptimizedImage/SimpleOptimizedImage';
-import PageLayout from '@/components/layout/PageLayout';
+import PageLayout from '@/layouts/PageLayout';
 
 export default function TestPage() {
   // URL de teste do Cloudinary que estava falhando

@@ -8,7 +8,8 @@
  * Can monitor either window scroll or a specific container scroll.
  */
 
-import { useState, useEffect, useCallback, RefObject } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { RefObject } from 'react/index';
 
 interface ScrollProgress {
   scrollProgress: number; // 0-100 percentage

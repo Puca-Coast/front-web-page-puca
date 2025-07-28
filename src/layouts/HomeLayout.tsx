@@ -51,7 +51,7 @@ export default function HomeLayout({
       </div>
 
       <div style={{ zIndex: LAYOUT_TOKENS.footer.zIndex }}>
-        <Footer isHome={!introCompleted} />
+        <Footer />
       </div>
     </div>
   );
