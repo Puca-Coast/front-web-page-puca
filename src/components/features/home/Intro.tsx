@@ -11,87 +11,114 @@ interface IntroProps {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function Intro({ onComplete }: IntroProps) {
-  const [introState, setIntroState] = useState<'active' | 'fading' | 'complete'>('active');
+  const [introState, setIntroState] = useState<'loading' | 'active' | 'fading' | 'complete'>('loading');
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
-  // Pré-carregamento dos dados do carrossel e imagens durante a exibição da intro
+  // Preload video
+  useEffect(() => {
+    const video = document.createElement('video');
+    video.src = '/assets/introVideo.mp4';
+    
+    video.onloadeddata = () => {
+      console.log('Video loaded successfully');
+      setVideoLoaded(true);
+    };
+    
+    video.onerror = () => {
+      console.error('Error loading video');
+      setVideoLoaded(true); // Continue anyway
+    };
+    
+    // Force load
+    video.load();
+  }, []);
+
+  // Start intro only when video is loaded
+  useEffect(() => {
+    if (videoLoaded && imagesPreloaded) {
+      setIntroState('active');
+      
+      // Start fade timer
+      const timer = setTimeout(() => {
+        setIntroState('fading');
+      }, 3500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [videoLoaded, imagesPreloaded]);
+
+  // Preload carousel data
   useEffect(() => {
     const preloadCarouselData = async () => {
-      // 1. Buscar dados das imagens se não estiverem em cache
-      if (!localStorage.getItem("carouselPhotos")) {
-        try {
-          const response = await fetch(
-            `${API_BASE_URL}/api/lookbook/photos?launch=primavera2024&limit=10`
-          );
-          const data = await response.json();
-          
-          if (data.success) {
-            localStorage.setItem("carouselPhotos", JSON.stringify(data.data));
-            
-            // 2. Pré-carregar pelo menos 3 imagens
-            const preloadImages = async () => {
-              try {
-                const imagePromises = data.data.slice(0, 3).map((photo: any) => {
-                  return new Promise((resolve, reject) => {
-                    const img = new window.Image();
-                    img.src = photo.url;
-                    img.onload = () => resolve(img);
-                    img.onerror = reject;
-                  });
-                });
-                
-                await Promise.all(imagePromises);
-                setImagesPreloaded(true);
-              } catch (error) {
-                console.error("Erro ao pré-carregar imagens:", error);
-                // Mesmo com erro, continuamos o fluxo
-                setImagesPreloaded(true);
-              }
-            };
-            
-            preloadImages();
-          }
-        } catch (error) {
-          setImagesPreloaded(true); // Continuar mesmo com erro
+      try {
+        const cached = localStorage.getItem("carousel_photos_v2");
+        if (cached) {
+          setImagesPreloaded(true);
+          return;
         }
-      } else {
-        // Se já temos dados em cache, apenas marcar como carregado
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/lookbook/photos?launch=primavera2024&limit=10`
+        );
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          // Preload first 3 images
+          const imagePromises = data.data.slice(0, 3).map((photo: any) => {
+            return new Promise((resolve) => {
+              const img = new window.Image();
+              img.src = photo.url;
+              img.onload = resolve;
+              img.onerror = resolve; // Continue even if error
+            });
+          });
+          
+          await Promise.all(imagePromises);
+        }
+      } catch (error) {
+        console.error("Error preloading carousel:", error);
+      } finally {
         setImagesPreloaded(true);
       }
     };
     
     preloadCarouselData();
-    
-    // Iniciar fade out da intro após 3.5 segundos
-    const startFadeTimer = setTimeout(() => {
-      setIntroState('fading');
-    }, 3500);
-    
-    return () => clearTimeout(startFadeTimer);
   }, []);
   
-  // Monitorar quando o estado muda para 'fading' e imagens estão pré-carregadas
+  // Complete intro after fade
   useEffect(() => {
-    if (introState === 'fading' && imagesPreloaded) {
-      // Após iniciar o fade out, espera mais 1 segundo antes de completar
-      const completeTimer = setTimeout(() => {
+    if (introState === 'fading') {
+      const timer = setTimeout(() => {
         setIntroState('complete');
         onComplete();
       }, 1500);
       
-      return () => clearTimeout(completeTimer);
+      return () => clearTimeout(timer);
     }
-  }, [introState, imagesPreloaded, onComplete]);
+  }, [introState, onComplete]);
+
+  // Show loading while video loads
+  if (introState === 'loading') {
+    return (
+      <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="mb-4">
+            <div className="animate-spin h-8 w-8 border-4 border-white border-t-transparent rounded-full mx-auto"></div>
+          </div>
+          <p className="text-sm opacity-70">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AnimatePresence>
       {introState !== 'complete' && (
         <motion.div
-          className="absolute top-0 left-0 w-full h-full bg-black flex items-center justify-center flex-col z-50 overflow-y-hidden"
+          className="fixed inset-0 bg-black flex items-center justify-center z-50"
           initial={{ opacity: 1 }}
-          animate={{ 
-            opacity: introState === 'fading' ? 0 : 1 
-          }}
+          animate={{ opacity: introState === 'fading' ? 0 : 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1, ease: "easeInOut" }}
         >
@@ -101,26 +128,21 @@ export default function Intro({ onComplete }: IntroProps) {
             muted
             playsInline
             disablePictureInPicture
-            className="object-cover w-full h-full absolute z-0"
+            className="absolute inset-0 w-full h-full object-cover"
             src="/assets/introVideo.mp4"
           />
           
           <motion.div 
-            initial={{ opacity: 0, y: 0 }}
+            initial={{ opacity: 0 }}
             animate={{ 
-              opacity: introState === 'fading' ? 0 : 1, 
-              y: [0, -15, 15, 0],
-              transition: { 
-                opacity: { duration: 1, ease: "easeInOut" },
-                y: { 
-                  duration: 5, 
-                  repeat: Infinity, 
-                  repeatType: "reverse", 
-                  ease: "easeInOut" 
-                }
-              }
+              opacity: introState === 'fading' ? 0 : 1,
+              y: [0, -15, 15, 0]
             }}
-            className="z-10"
+            transition={{ 
+              opacity: { duration: 1 },
+              y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
+            }}
+            className="relative z-10"
           >
             <Image
               src="/assets/logo.png"
@@ -128,23 +150,8 @@ export default function Intro({ onComplete }: IntroProps) {
               width={500}
               height={200}
               priority
-              className="w-1/2 mx-auto"
+              className="w-auto h-auto max-w-[80vw]"
             />
-          </motion.div>
-          
-          {/* Indicador de pré-carregamento */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ 
-              opacity: imagesPreloaded ? 0 : 0.7
-            }}
-            className="absolute bottom-10 left-0 right-0 flex justify-center items-center text-white z-20"
-          >
-            <div className="flex gap-2">
-              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-              <div className="w-2 h-2 bg-white rounded-full animate-pulse delay-100"></div>
-              <div className="w-2 h-2 bg-white rounded-full animate-pulse delay-200"></div>
-            </div>
           </motion.div>
         </motion.div>
       )}

@@ -5,7 +5,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import { useInView } from "react-intersection-observer";
 import WavyLoader from "@/components/ui/WavyLoader";
-import { lookbookService, LookbookPhoto } from "@/lib/services/api/lookbookService";
+import {
+  lookbookService,
+  LookbookPhoto,
+} from "@/lib/services/api/lookbookService";
 import { CarouselHomeProps } from "@/types";
 import { SimpleLookbookImage } from "@/components/ui/OptimizedImage/SimpleOptimizedImage";
 
@@ -40,7 +43,10 @@ function useLookbookPhotos() {
       const now = Date.now();
 
       // Verificar se o cache ainda é válido
-      if (now - cachedData.timestamp < CACHE_EXPIRY && cachedData.photos.length > 0) {
+      if (
+        now - cachedData.timestamp < CACHE_EXPIRY &&
+        cachedData.photos.length > 0
+      ) {
         return cachedData.photos;
       }
 
@@ -59,7 +65,7 @@ function useLookbookPhotos() {
     try {
       const cacheData: CachedData = {
         photos,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
       localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
     } catch (error) {
@@ -72,7 +78,7 @@ function useLookbookPhotos() {
     try {
       setError(null);
       const response = await lookbookService.getPhotos(1, 10, "primavera2024");
-      
+
       if (response.success && response.data.length > 0) {
         setPhotos(response.data);
         setCachedData(response.data);
@@ -90,12 +96,12 @@ function useLookbookPhotos() {
   // Inicializar dados
   useEffect(() => {
     const cachedPhotos = getCachedData();
-    
+
     if (cachedPhotos) {
       // Usar cache e carregar em background
       setPhotos(cachedPhotos);
       setLoading(false);
-      
+
       // Atualizar em background se necessário
       setTimeout(fetchLookbookPhotos, 1000);
     } else {
@@ -108,9 +114,14 @@ function useLookbookPhotos() {
 }
 
 // Componente otimizado para imagem com lazy loading
-const OptimizedImage = ({ photo, index, isPriority }: { 
-  photo: LookbookPhoto; 
-  index: number; 
+// Update the OptimizedImage component
+const OptimizedImage = ({
+  photo,
+  index,
+  isPriority,
+}: {
+  photo: LookbookPhoto;
+  index: number;
   isPriority: boolean;
 }) => {
   const { ref, inView } = useInView({
@@ -119,18 +130,23 @@ const OptimizedImage = ({ photo, index, isPriority }: {
     rootMargin: "100px",
   });
 
-  // Otimizar tamanho da imagem baseado no dispositivo
-  const sizes = useMemo(() => "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw", []);
+  const sizes = useMemo(
+    () => "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+    []
+  );
 
   return (
-    <div ref={ref} className="relative w-full h-full overflow-hidden">
+    <div
+      ref={ref}
+      className="relative w-full h-full overflow-hidden flex items-center justify-center bg-gray-50"
+    >
       {(inView || isPriority) && (
         <SimpleLookbookImage
           src={photo.url}
           alt={photo.description || `Lookbook ${index + 1}`}
           width={1200}
           height={1080}
-          className="w-full h-full object-center"
+          className="w-full h-full object-contain" // Changed from object-center to object-contain
           priority={isPriority}
           sizes={sizes}
         />
@@ -147,13 +163,12 @@ export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
     triggerOnce: false,
   });
 
-  // Otimizar velocidade do carousel baseado na interação
   const handleMouseEnter = useCallback(() => {
-    setSwiperSpeed(15000); // Mais lento no hover
+    setSwiperSpeed(6000);
   }, []);
-  
+
   const handleMouseLeave = useCallback(() => {
-    setSwiperSpeed(5000); // Velocidade normal
+    setSwiperSpeed(5000);
   }, []);
 
   // Duplicar fotos para efeito infinito otimizado
@@ -165,7 +180,7 @@ export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
   // Loading state
   if (loading) {
     return (
-      <div 
+      <div
         className="relative w-full bg-gray-100 flex items-center justify-center"
         style={{ height: carouselHeight || "300px" }}
       >
@@ -177,7 +192,7 @@ export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
   // Error state
   if (error || photos.length === 0) {
     return (
-      <div 
+      <div
         className="relative w-full bg-gray-100 flex items-center justify-center"
         style={{ height: carouselHeight || "300px" }}
       >
@@ -187,8 +202,8 @@ export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
   }
 
   return (
-    <div 
-      ref={ref} 
+    <div
+      ref={ref}
       className="marquee-container relative w-full bg-white overflow-hidden"
       style={{ height: carouselHeight || "300px" }}
       onMouseEnter={handleMouseEnter}
@@ -200,16 +215,17 @@ export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
         slidesPerView="auto"
         loop={true}
         autoplay={{
-          delay: 0,
+          delay: 0, // Changed from 0 to 3000ms (3 seconds between slides)
           disableOnInteraction: false,
-          pauseOnMouseEnter: false,
+          pauseOnMouseEnter: true, // Changed to true for better UX
           reverseDirection: false,
+          stopOnLastSlide: false,
         }}
-        speed={swiperSpeed}
+        speed={swiperSpeed} // This controls transition speed, not autoplay speed
         centeredSlides={false}
         allowTouchMove={true}
         grabCursor={true}
-        freeMode={true}
+        freeMode={false} // Changed to false for controlled sliding
         watchSlidesProgress={true}
         className="h-full marquee-wrapper bg-white"
       >
@@ -219,15 +235,14 @@ export default function CarouselHome({ carouselHeight }: CarouselHomeProps) {
             className="marquee-item"
             style={{ width: "auto", height: "100%" }}
           >
-            <OptimizedImage 
-              photo={photo} 
+            <OptimizedImage
+              photo={photo}
               index={index}
               isPriority={index < 4} // Priorizar as primeiras 4 imagens
             />
           </SwiperSlide>
         ))}
       </Swiper>
-
       {/* Overlay sutil para melhor contraste */}
       <div className="absolute inset-0 bg-black bg-opacity-5 pointer-events-none" />
     </div>
