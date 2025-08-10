@@ -17,6 +17,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { LAYOUT_TOKENS } from '@/design-system/tokens/layout';
 import { cn } from '@/design-system/utils/cn';
+import { SkipLinks } from '@/components/ui';
 
 export default function BaseLayout({ 
   children, 
@@ -45,25 +46,29 @@ export default function BaseLayout({
 }) {
   return (
     <div className={cn("min-h-screen flex flex-col", className)} style={style}>
+      <SkipLinks />
+      
       {includeHeader && (
-        <div style={{ zIndex: LAYOUT_TOKENS.header.zIndex }}>
+        <header id="main-navigation" style={{ zIndex: LAYOUT_TOKENS.header.zIndex }}>
           <Header isHome={headerProps?.isHome ?? false} />
-        </div>
+        </header>
       )}
       
       <main 
+        id="main-content"
         className="flex-1"
         style={{ 
           paddingTop: includeHeader && !noPaddingTop ? `${LAYOUT_TOKENS.content.paddingTop}px` : 0 
         }}
+        tabIndex={-1}
       >
         {children}
       </main>
       
       {includeFooter && (
-        <div style={{ zIndex: LAYOUT_TOKENS.footer.zIndex }}>
+        <footer id="footer" style={{ zIndex: LAYOUT_TOKENS.footer.zIndex }}>
           <Footer />
-        </div>
+        </footer>
       )}
     </div>
   );

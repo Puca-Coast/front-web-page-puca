@@ -1,11 +1,16 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { motion, Variants } from "framer-motion";
 import { PageLayout } from "@/layouts";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { productService, Product } from "@/lib/services/api/productService";
+import { useInfiniteProducts } from "@/lib/hooks/useProducts";
+import { useSmartPrefetch, useIntersectionPrefetch } from "@/lib/hooks/usePrefetch";
+import { ProductGridSkeleton, ErrorBoundary, ErrorState, LoadingIndicator, EmptyState } from "@/components/ui";
+import { usePageAnnouncement, useLoadingAnnouncement, useErrorAnnouncement } from "@/lib/providers/AccessibilityProvider";
+import ProductCard from "@/components/features/products/ProductCard";
 
 interface ProductItem {
   _id: string;
@@ -16,14 +21,22 @@ interface ProductItem {
   sizes: { size: string; stock: number }[];
 }
 
-export default function Shop() {
-  const [items, setItems] = useState<ProductItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+function ShopContent() {
   const router = useRouter();
+  const { 
+    data, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage, 
+    isLoading, 
+    isError, 
+    error 
+  } = useInfiniteProducts(20);
+  
+  const { preloadProductImages, trackInteraction, prefetchProduct } = useSmartPrefetch();
 
-  const controllerRef = useRef<AbortController | null>(null);
+  // State declarations moved up to avoid reference errors
+  const [hoverIdx, setHoverIdx] = React.useState<number | null>(null);
 
   // Função para mapear produtos da API
   const mapProduct = useCallback((product: Product): ProductItem => {
@@ -48,53 +61,62 @@ export default function Shop() {
     };
   }, []);
 
-  // Buscar produtos
-  const fetchProducts = useCallback(async () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort();
-    }
-
-    const controller = new AbortController();
-    controllerRef.current = controller;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await productService.getProducts(1, 20);
-      
-      if (!response.success) {
-        throw new Error("Erro ao buscar produtos");
-      }
-
-      const mappedProducts = response.data.map(mapProduct);
-      setItems(mappedProducts);
-      
-    } catch (err: any) {
-      if (err.name !== "AbortError") {
-        console.error("Erro ao buscar produtos:", err);
-        setError("Erro ao carregar produtos");
-      }
-    } finally {
-      if (!controller.signal.aborted) {
-        setLoading(false);
-      }
-    }
-  }, [mapProduct]);
-
-  useEffect(() => {
-    fetchProducts();
+  // Flatten all products from all pages and memoize the result
+  const allProducts = useMemo(() => {
+    if (!data?.pages) return [];
     
-    return () => {
-      if (controllerRef.current) {
-        controllerRef.current.abort();
+    return data.pages.flatMap(page => 
+      page.success ? page.data.map(mapProduct) : []
+    );
+  }, [data?.pages, mapProduct]);
+
+  // Accessibility announcements
+  usePageAnnouncement('Loja PUCA', 'Explore nossa coleção de produtos streetwear');
+  useLoadingAnnouncement(isLoading, 'Carregando produtos...', `${allProducts.length} produtos carregados`);
+  useErrorAnnouncement(error?.message || null);
+
+  // Pre-compute product ID to index mapping for O(1) hover lookups
+  const productIndexMap = useMemo(() => {
+    const map = new Map<string, number>();
+    allProducts.forEach((product, index) => {
+      map.set(product._id, index);
+    });
+    return map;
+  }, [allProducts]);
+
+  // Preload images when products change
+  React.useEffect(() => {
+    if (allProducts.length > 0) {
+      preloadProductImages(allProducts);
+    }
+  }, [allProducts, preloadProductImages]);
+
+  // Intersection observer for infinite scrolling
+  const loadMoreRef = useIntersectionPrefetch(
+    useCallback(() => {
+      if (hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
       }
-    };
-  }, [fetchProducts]);
+    }, [hasNextPage, isFetchingNextPage, fetchNextPage])
+  );
 
   const handleProductClick = (productId: string) => {
+    trackInteraction('click', 'product-card', { productId });
     router.push(`/product/${productId}`);
   };
+
+  const handleProductHover = useCallback((productId: string) => {
+    trackInteraction('hover', 'product-card', { productId });
+    // Prefetch product details when user hovers
+    prefetchProduct(productId);
+    // Use O(1) lookup instead of O(n) findIndex
+    const index = productIndexMap.get(productId);
+    setHoverIdx(index !== undefined ? index : null);
+  }, [trackInteraction, prefetchProduct, productIndexMap]);
+
+  const handleProductLeave = useCallback(() => {
+    setHoverIdx(null);
+  }, []);
 
   // Variantes de animação para Framer Motion
   const containerVariants = {
@@ -129,99 +151,67 @@ export default function Shop() {
     <PageLayout background="gradient" noPaddingTop={true}>
       <main className="flex-1 w-full z-10">
         
-        {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full mx-auto">
-            {Array.from({ length: 9 }).map((_, idx) => (
-              <div
-                key={`skeleton-${idx}`}
-                className="aspect-[3/4] bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse shadow-sm"
-              />
-            ))}
-          </div>
+        {/* Loading State */}
+        {isLoading && <ProductGridSkeleton count={9} />}
+
+        {/* Error State */}
+        {isError && (
+          <ErrorState
+            message={error?.message || 'Erro ao carregar produtos'}
+            onRetry={() => window.location.reload()}
+          />
         )}
 
-        {error && (
-          <div className="flex flex-col items-center justify-center py-32">
-            <div className="bg-white/80 backdrop-blur-sm p-8 shadow-lg border border-gray-200">
-              <p className="text-red-500 text-lg mb-6 text-center">{error}</p>
-              <button
-                onClick={fetchProducts}
-                className="px-8 py-3 bg-black text-white hover:bg-gray-800 transition-all duration-300"
-              >
-                Tentar Novamente
-              </button>
-            </div>
-          </div>
-        )}
-
-        {!loading && !error && (
+        {/* Products Grid */}
+        {!isLoading && !isError && allProducts.length > 0 && (
           <motion.div 
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full mx-auto"
             variants={containerVariants}
             animate="visible"
           >
-            {items.map((item, i) => (
-              <motion.div
-                key={item._id}
-                className="group relative cursor-pointer transition-all duration-300 w-full"
-                variants={itemVariants}
-                onMouseEnter={() => setHoverIdx(i)}
-                onMouseLeave={() => setHoverIdx(null)}
-                onClick={() => handleProductClick(item._id)}
-                whileHover={{ 
-                  transition: { duration: 0.2 }
-                }}
-              >
-               
-                <div className="relative">
-                  
-         
-                  <div className="relative w-full bg-white group aspect-[3/4] lg:aspect-auto lg:h-[calc(92vh)]">
-                    
-     
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.name}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className={`
-                        object-contain lg:object-cover transition-all duration-500
-                        ${hoverIdx === i ? 'opacity-0' : 'opacity-100'}
-                      `}
-                      priority={i < 6}
-                    />
-                    
-              
-                    <Image
-                      src={item.hoverImageUrl}
-                      alt={`${item.name} - hover`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className={`
-                        object-cover absolute inset-0 transition-all duration-500
-                        ${hoverIdx === i ? 'opacity-100' : 'opacity-0'}
-                      `}
-                    />
-                  </div>
-
-            
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-transparent backdrop-blur-sm">
-                    <h3 className="text-sm font-medium text-gray-900 uppercase tracking-tight line-clamp-1">
-                      {item.name}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {item.sizes.map(s => s.size).join(' / ')}
-                    </p>
-                    <p className="text-sm font-semibold text-gray-900 mt-1">
-                      R$ {item.price.toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
+            {allProducts.map((product, i) => (
+              <ProductCard
+                key={product._id}
+                product={product}
+                index={i}
+                isHovered={hoverIdx === i}
+                onHover={handleProductHover}
+                onLeave={handleProductLeave}
+                onClick={handleProductClick}
+              />
             ))}
           </motion.div>
         )}
+
+        {/* Load More Trigger & Loading State */}
+        {hasNextPage && (
+          <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
+            {isFetchingNextPage && (
+              <LoadingIndicator text="Carregando mais produtos..." />
+            )}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !isError && allProducts.length === 0 && (
+          <EmptyState
+            title="Nenhum produto encontrado"
+            description="Não encontramos produtos no momento. Tente novamente mais tarde."
+            action={{
+              text: "Recarregar Página",
+              onClick: () => window.location.reload()
+            }}
+          />
+        )}
       </main>
     </PageLayout>
+  );
+}
+
+export default function Shop() {
+  return (
+    <ErrorBoundary level="page">
+      <ShopContent />
+    </ErrorBoundary>
   );
 }

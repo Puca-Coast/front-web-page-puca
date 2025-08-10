@@ -1,19 +1,26 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import "@/styles/headerStyles.css";
 import CartModal from "@/components/features/cart/Cart";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRoutePrefetch } from "@/lib/hooks/usePrefetch";
 
 export default function Header({ isHome }: { isHome: boolean }) {
   const { cartItems } = useCart();
   const { user, isLoading } = useAuth();
+  const { prefetchRoute } = useRoutePrefetch();
   const [isVisible, setIsVisible] = useState(!isHome);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const headerRef = useRef<HTMLDivElement | null>(null);
+
+  // Prefetch handler for navigation links
+  const handleLinkHover = useCallback((route: string) => {
+    prefetchRoute(route);
+  }, [prefetchRoute]);
 
   useEffect(() => {
     if (isHome) {
@@ -58,13 +65,25 @@ export default function Header({ isHome }: { isHome: boolean }) {
         
         {/* Links de navegação */}
         <div className="hidden md:flex flex-row gap-8">
-          <Link href="/lookbook" className="headerText">
+          <Link 
+            href="/lookbook" 
+            className="headerText"
+            onMouseEnter={() => handleLinkHover('/lookbook')}
+          >
             Lookbook
           </Link>
-          <Link href="/shop" className="headerText">
+          <Link 
+            href="/shop" 
+            className="headerText"
+            onMouseEnter={() => handleLinkHover('/shop')}
+          >
             Shop
           </Link>
-          <Link href="/collections" className="headerText">
+          <Link 
+            href="/collections" 
+            className="headerText"
+            onMouseEnter={() => handleLinkHover('/collections')}
+          >
             Collections
           </Link>
         </div>

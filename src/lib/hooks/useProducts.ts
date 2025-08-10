@@ -1,46 +1,53 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { productService } from '@/lib/services/api/productService';
-
-// Query keys para cache
-export const productKeys = {
-  all: ['products'] as const,
-  lists: () => [...productKeys.all, 'list'] as const,
-  list: (filters: any) => [...productKeys.lists(), filters] as const,
-  details: () => [...productKeys.all, 'detail'] as const,
-  detail: (id: string) => [...productKeys.details(), id] as const,
-};
+import { queryKeys, staleTime, cacheTime, cacheInvalidation } from '../queryKeys';
 
 // Hook para buscar produtos com cache
 export function useProducts(page = 1, limit = 20) {
   return useQuery({
-    queryKey: productKeys.list({ page, limit }),
+    queryKey: queryKeys.products.list({ page, limit }),
     queryFn: () => productService.getProducts(page, limit),
-    staleTime: 60 * 60 * 1000, // 1 hora
-    gcTime: 2 * 60 * 60 * 1000, // 2 horas
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    staleTime: staleTime.PRODUCTS,
+    gcTime: cacheTime.GC_TIME,
+  });
+}
+
+// Hook para buscar produtos com infinite scrolling
+export function useInfiniteProducts(limit = 20) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.products.lists(),
+    queryFn: ({ pageParam = 1 }) => productService.getProducts(pageParam, limit),
+    staleTime: staleTime.PRODUCTS,
+    gcTime: cacheTime.GC_TIME,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage.success || !lastPage.pagination) return undefined;
+      
+      const { currentPage, totalPages } = lastPage.pagination;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    initialPageParam: 1,
   });
 }
 
 // Hook para buscar produto específico
 export function useProduct(id: string) {
   return useQuery({
-    queryKey: productKeys.detail(id),
+    queryKey: queryKeys.products.detail(id),
     queryFn: () => productService.getProductById(id),
     enabled: !!id,
-    staleTime: 30 * 60 * 1000, // 30 minutos
-    gcTime: 60 * 60 * 1000, // 1 hora
+    staleTime: staleTime.PRODUCTS,
+    gcTime: cacheTime.GC_TIME,
   });
 }
 
 // Hook para buscar produtos por nome
 export function useProductsBySearch(searchTerm: string) {
   return useQuery({
-    queryKey: productKeys.list({ search: searchTerm }),
+    queryKey: queryKeys.products.search(searchTerm),
     queryFn: () => productService.searchProductsByName(searchTerm),
     enabled: !!searchTerm && searchTerm.length >= 2,
-    staleTime: 15 * 60 * 1000, // 15 minutos
-    gcTime: 30 * 60 * 1000, // 30 minutos
+    staleTime: staleTime.SEARCH,
+    gcTime: cacheTime.GC_TIME,
   });
 }
 
@@ -51,8 +58,10 @@ export function useProductMutations() {
   const createProduct = useMutation({
     mutationFn: productService.createProduct,
     onSuccess: () => {
-      // Invalidar cache de produtos
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+      // Invalidar cache de produtos usando invalidation helper
+      cacheInvalidation.onProductUpdate('new').forEach(queryKey => {
+        queryClient.invalidateQueries({ queryKey });
+      });
     },
   });
 
@@ -61,9 +70,12 @@ export function useProductMutations() {
       productService.updateProduct(id, data),
     onSuccess: (data, variables) => {
       // Atualizar cache específico do produto
-      queryClient.setQueryData(productKeys.detail(variables.id), data);
-      // Invalidar cache de listas
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+      queryClient.setQueryData(queryKeys.products.detail(variables.id), data);
+      
+      // Invalidar caches relacionados
+      cacheInvalidation.onProductUpdate(variables.id).forEach(queryKey => {
+        queryClient.invalidateQueries({ queryKey });
+      });
     },
   });
 
@@ -71,9 +83,12 @@ export function useProductMutations() {
     mutationFn: productService.deleteProduct,
     onSuccess: (data, variables) => {
       // Remover do cache
-      queryClient.removeQueries({ queryKey: productKeys.detail(variables) });
-      // Invalidar cache de listas
-      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+      queryClient.removeQueries({ queryKey: queryKeys.products.detail(variables) });
+      
+      // Invalidar caches relacionados
+      cacheInvalidation.onProductUpdate(variables).forEach(queryKey => {
+        queryClient.invalidateQueries({ queryKey });
+      });
     },
   });
 
